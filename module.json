@@ -1,0 +1,34 @@
+{
+  "name": "fvtt-moulinette",
+  "title": "Moulinette for FoundryVTT",
+  "description": "Moulinette is a set of tools for importing packs of scenes, images, playlists prepared by the community.",
+  "version": "0.1",
+  "author": "Sven Werlen",
+  "scripts": ["moulinette.js", "scripts/moulinette-lib.js"],
+  "styles": ["moulinette.css"],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "fr",
+      "name": "French",
+      "path": "lang/fr.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "moulinette-macros",
+      "label": "Moulinette Macros",
+      "path": "./packs/moulinette-macros.db",
+      "entity": "Macro"
+    }
+  ],
+  "url": "https://github.com/SvenWerlen/fvtt-moulinette",
+  "download": "https://github.com/SvenWerlen/fvtt-moulinette/archive/v-0.1.zip",
+  "manifest": "https://raw.githubusercontent.com/SvenWerlen/fvtt-moulinette/master/module.json",
+  "minimumCoreVersion": "0.7.6",
+  "compatibleCoreVersion": "1.0.0"
+}

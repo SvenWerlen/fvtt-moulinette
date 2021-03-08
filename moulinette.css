@@ -1,0 +1,70 @@
+.mtte .main {
+  margin-bottom: 20px;
+}
+
+.mtte td {
+  text-align: center;
+}
+
+.mtte img.button {
+  width: 100px;
+  border: 0px;
+  cursor: pointer;
+}
+
+.mtte img.button:hover {
+  opacity: 50%;
+}
+
+.mtte .preview {
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.mtte .list {
+  height: 200px;
+  overflow-y: scroll;
+  margin-top: 5px;
+}
+
+.mtte .logo {
+  float: left;
+  padding-right: 10px;
+  padding-bottom: 5px;
+  border: 0px;
+}
+
+.mtte .description {
+  font-style: italic;
+}
+
+.mtte input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 1px 3px;
+}
+
+.mtte .pack {
+  display:flex;
+  align-items:center;
+}
+
+.mtte .list > div:nth-of-type(odd) {
+  background: rgba(180, 180, 180, 0.73);
+}
+
+.mtte .list .pack:hover {
+  background-color: #666;
+  color: #eee;
+}
+  
+.mtte .thumb { 
+  overflow: hidden;
+  margin: auto;
+  width: 400px;
+  height: 400px;
+}
+
+.mtte .info {
+  text-align: center;
+}

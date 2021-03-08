@@ -1,0 +1,26 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+  <p>{{localize "mtte.homeWelcome"}}</p>
+  {{#if error}}
+  <div class="error">{{error}}</div>
+  {{/if}}
+  {{#unless error}}
+    <table>
+      <tr>
+        <th>{{localize "mtte.communityMarket"}}</th>
+        <th>{{localize "mtte.moulinetteMine"}}</th>
+      </tr>
+      <tr>
+        <td><img class="button market" src="modules/fvtt-moulinette/img/moulinette-market.png" /></td>
+        <td><img class="button requests" src="modules/fvtt-moulinette/img/moulinette-icon.png" /></td>
+      </tr>
+      <tr>
+        <td>{{localize "mtte.communityMarketHelp"}}</td>
+        <td>{{localize "mtte.moulinetteMineHelp"}}</td>
+      </tr>
+    </table>
+  {{/unless}}
+  <p><em>
+    <a href="https://github.com/SvenWerlen/moulinette">{{localize "mtte.seeDoc"}}</a> {{localize "mtte.learnMore"}}
+  </em></p>
+  
+</form>

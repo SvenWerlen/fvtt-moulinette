@@ -1,0 +1,21 @@
+{
+    "mtte.moulinetteHome": "Moulinette Home",
+    "mtte.homeWelcome": "Welcome! Moulinette gives you access to a community market of various items (scenes, images, playlists) that you can easily install without having to install separate modules.",
+    "mtte.readMore": "Learn more about Moulinette",
+    "mtte.communityMarket": "Community Market",
+    "mtte.moulinetteMine": "Moulinette Mine",
+    "mtte.communityMarketHelp": "Visit the community market and choose what you want.",
+    "mtte.moulinetteMineHelp": "See pending requests from the market place.",
+    "mtte.seeDoc": "See documentation",
+    "mtte.learnMore": "to learn more about Moulinette and/or support it.",
+    "mtte.submit": "Submit request",
+    
+    "mtte.marketWelcome": "Instructions : check all resources you want to request Moulinette.",
+    "mtte.preview": "See preview of the scene.",
+    "mtte.clickToClose": "Click anywhere to close preview window",
+    
+    "ERROR.mtteGMOnly": "This interface is only for GMs.",
+    "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
+    
+    "mtte.END": ""
+}

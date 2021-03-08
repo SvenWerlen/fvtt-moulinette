@@ -1,0 +1,39 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+  <p>{{localize "mtte.marketWelcome"}}</p>
+  {{#if error}}
+  <div class="error">{{error}}</div>
+  {{/if}}
+  {{#unless error}}
+    <div class="main">
+      <p>
+        <h3>Scenes</h3>
+        <div class="description">Scenes currently available for Moulinette. See <a href="https://github.com/SvenWerlen/moulinette-data/tree/main/scenes" target="_blank">scenes</a>.</div>
+        <div class="search"><input id="searchScenes" type="text" placeholder="{{lists.scenes.length}} packs. Type something to filter list"></input></div>
+        <div id="scenePacks" class="list">
+        {{#each lists.scenes as |sc|}}
+          <div for="{{sc.name}}" class="pack" title="{{sc.description}}">
+            <input type="checkbox" class="check" name="{{sc.id}}" value="{{sc.url}}">
+            {{sc.name}} 
+            <i class="preview fas fa-eye"  data-id="{{sc.filename}}" title="{{localize "mtte.preview"}}"></i>
+          </div>
+        {{/each}}
+        </div>
+      </p>
+      <p>
+        <input class="button" type="submit" value="{{localize "mtte.submit"}}" />
+      </p>
+    </div>
+    <img class="logo" src="modules/fvtt-moulinette/img/moulinette-icon.png" width="60"/>
+    <p>This is still a prototype. Interface is minimalistic and server resources are kept small until <a href="https://www.patreon.com/moulinette" target="_blank">Patron support</a> will be enough to afford more. Join me on <a href="https://discord.gg/xg3dcMQfP2" target="_blank">Moulinette Discord</a> to follow development and support it. Current limitations :
+      <ul class="restrictions">
+        <li>Maximum 3 packs per request.</li>
+        <li>Maximum 3 requests per day.</li>
+      </ul>
+    </p>
+    </div>
+  {{/unless}}
+  <p><em>
+    <a href="https://github.com/SvenWerlen/moulinette">{{localize "mtte.seeDoc"}}</a> {{localize "mtte.learnMore"}}
+  </em></p>
+  
+</form>
