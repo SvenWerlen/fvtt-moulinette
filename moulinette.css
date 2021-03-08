@@ -68,3 +68,25 @@
 .mtte .info {
   text-align: center;
 }
+
+.mtte .actions {
+  display: inline;
+}
+
+.mtte .messagebox {
+  display: inline;
+  margin-left: 10px;
+  visibility: hidden;
+}
+
+.mtte .messagebox i {
+  margin-right: 5px;
+}
+
+.mtte .messagebox.error {
+  color: darkred;
+}
+
+.mtte .messagebox.success {
+  color: darkgreen;
+}

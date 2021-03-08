@@ -140,10 +140,10 @@ class MoulinetteMarket extends FormApplication {
     }
     
     let client = new MoulinetteClient()
-    let lists = await client.send("/bundler/fvtt/packs", "GET")
+    let lists = await client.get("/bundler/fvtt/packs")
     if( lists.status == 200 ) {
-      console.log(lists)
-      return { lists: lists.data }
+      this.lists = lists.data
+      return { lists: this.lists }
     } else {
       console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
       return { error: game.i18n.localize("ERROR.mtteServerCommunication") }
@@ -152,6 +152,7 @@ class MoulinetteMarket extends FormApplication {
 
   activateListeners(html) {
     super.activateListeners(html);
+    const window = this;
     
     // filter function
     html.find("#searchScenes").on("keyup", function() {
@@ -160,24 +161,64 @@ class MoulinetteMarket extends FormApplication {
         const text = $(this).text().trim().toLowerCase() + $(this).attr("title");
         $(this).css('display', text.length == 0 || text.indexOf(filter) >= 0 ? 'block' : 'none')
       });
+      window._hideMessagebox();
     });
     
     // click on preview
     html.find(".preview").click(this._onPreview.bind(this));
+    
+    // keep messagebox reference for _updateObject
+    this.msgbox = html.find(".messagebox")
+    
+    // hide error/success message on anychange
+    html.find(".check").click(this._hideMessagebox.bind(this));
+    
+  }
+  
+  _hideMessagebox(event) {
+    if(this.msgbox) {
+      this.msgbox.css('visibility', 'hidden'); 
+    }
   }
   
   _onPreview(event) {
     event.preventDefault();
     const source = event.currentTarget;
     const sceneId = source.dataset.id;
-    
     const thumbURL = `${MoulinetteClient.SERVER_URL}/static/thumbs/${sceneId}.webp`
     new MoulinettePreviewer({ thumb: thumbURL}).render(true)
+    this._hideMessagebox()
   }
   
-  _updateObject(event) {
+  async _updateObject(event, inputs) {
     event.preventDefault();
-    console.log(event)
+    console.log(this.lists)
+    if(!this.lists || !this.lists.scenes || !this.msgbox) {
+      return;
+    }
+    
+    const selected = this.lists.scenes.filter( sc => sc.id in inputs && inputs[sc.id] )
+    if(selected.length == 0) {
+      this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.mtteSelectAtLeastOne"));
+    } else if (selected.length > 3) {
+      this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.mtteTooMany"));
+    } else {
+      // submit request
+      const moduleName = "FoundryVTT"
+      let userId = game.settings.get("moulinette", "userId", "")
+      let client = new MoulinetteClient()
+      let data = { userId: userId, module: moduleName }
+      selected.forEach( s => data[s.id] = true )
+      let response = await client.post("/v2/bundler/fvtt/task", data)
+      if(response.status == 200) {
+        this.msgbox.addClass('success').css('visibility', 'visible').find('.message').text(game.i18n.localize("mtte.requestSuccessful"));
+      } else if(response.status == 403) {
+        this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.tooManyRequests"));
+      } else {
+        console.log("Moulinette | Response from server", response)
+        this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.requestFailed"));
+      }
+    }
   }
 }
 

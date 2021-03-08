@@ -13,9 +13,14 @@
     "mtte.marketWelcome": "Instructions : check all resources you want to request Moulinette.",
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
+    "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
     
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
+    "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
+    "ERROR.mtteTooMany": "You selected too many elements at once. See limitations below.",
+    "ERROR.requestFailed": "Your request failed for unknown reasons. See Discord link below for further investigation",
+    "ERROR.tooManyRequests": "You sent too many requests for the day. See limitations below.",
     
     "mtte.END": ""
 }

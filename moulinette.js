@@ -1,9 +1,8 @@
 Hooks.once("init", () => {
 
   console.log("Moulinette | Init")
-  //loadTemplates(["modules/data-toolbox/templates/dialog-toolbox.html"]);
   
-//   game.settings.register("data-toolbox", "source", { scope: "world", config: false, type: String, default: "modules/data-toolbox/samples/bestiary-sample.csv" });
+  game.settings.register("moulinette", "userId", { scope: "world", config: false, type: String, default: randomID(26) });
 //   game.settings.register("data-toolbox", "template", { scope: "world", config: false, type: String, default: "modules/data-toolbox/samples/creature-template.json" });
 //   game.settings.register("data-toolbox", "entity", { scope: "world", config: false, type: String, default: "Actor" });
 //   game.settings.register("data-toolbox", "compendium", { scope: "world", config: false, type: String, default: "" });
