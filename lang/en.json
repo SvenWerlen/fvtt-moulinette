@@ -1,26 +1,31 @@
 {
     "mtte.moulinetteHome": "Moulinette Home",
-    "mtte.homeWelcome": "Welcome! Moulinette gives you access to a community market of various items (scenes, images, playlists) that you can easily install without having to install separate modules.",
+    "mtte.homeWelcome": "Welcome! Moulinette gives you access to various items (scenes, images, playlists) that you can easily forge without having to install separate modules.",
     "mtte.readMore": "Learn more about Moulinette",
-    "mtte.communityMarket": "Community Market",
-    "mtte.moulinetteMine": "Moulinette Mine",
-    "mtte.communityMarketHelp": "Visit the community market and choose what you want.",
-    "mtte.moulinetteMineHelp": "See pending requests from the market place.",
+    "mtte.moulinetteForge": "Moulinette Forge",
+    "mtte.moulinetteForgeHelp": "Forge some creations of the community.",
+    "mtte.moulinetteConfig": "Moulinette Other",
+    "mtte.moulinetteConfigHelp": "Under development. Not yet available",
     "mtte.seeDoc": "See documentation",
     "mtte.learnMore": "to learn more about Moulinette and/or support it.",
-    "mtte.submit": "Submit request",
+    "mtte.forge": "Forge items",
     
-    "mtte.marketWelcome": "Instructions : check all resources you want to request Moulinette.",
+    "mtte.forgeWelcome": "Instructions : check all resources you want to forge thanks to Moulinette.",
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
     "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
     
+    "mtte.forgingItem": "Forging {pack} ...",
+    "mtte.forgingItemMultiple": "Forging {pack} ({scene}) ...",
+    "mtte.forgingSuccess": "Items were successfully forged!",
+    "mtte.forgingFailure": "Something went bad. Report it to Moulinette Discord",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
-    "ERROR.mtteTooMany": "You selected too many elements at once. See limitations below.",
-    "ERROR.requestFailed": "Your request failed for unknown reasons. See Discord link below for further investigation",
-    "ERROR.tooManyRequests": "You sent too many requests for the day. See limitations below.",
+    "ERROR.mtteTooMany": "You selected too many elements at once. Maximum 3.",
+    "ERROR.mtteNotYetAvailable": "Not yet available",
+    "ERROR.mtteInProgress": "Forge is already active. Please wait!",
     
     "mtte.END": ""
 }

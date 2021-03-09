@@ -4,7 +4,7 @@
   "description": "Moulinette is a set of tools for importing packs of scenes, images, playlists prepared by the community.",
   "version": "0.1",
   "author": "Sven Werlen",
-  "scripts": ["moulinette.js", "scripts/moulinette-lib.js"],
+  "esmodules": ["moulinette.js"],
   "styles": ["moulinette.css"],
   "languages": [
     {

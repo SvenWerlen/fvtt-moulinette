@@ -5,7 +5,11 @@
 class MoulinetteClient {
   
   static SERVER_URL = "http://127.0.0.1:5000"
+  static SERVER_OUT = "http://127.0.0.1:5000/static/out/"
+  static GITHUB_SRC = "https://raw.githubusercontent.com/SvenWerlen/moulinette-data"
+  
   //static SERVER_URL = "https://boisdechet.org/moulinette"
+  //static SERVER_OUT = "https://boisdechet.org/moulinette/out/"
   static HEADERS = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
   
   token = null
@@ -18,7 +22,6 @@ class MoulinetteClient {
       method: method,
       headers: MoulinetteClient.HEADERS
     }
-    if( this.token ) { params.headers.Authorization = `Bearer ${this.token}`}
     if( data ) { params.body = JSON.stringify(data) }
 
     const response = await fetch(`${MoulinetteClient.SERVER_URL}${URI}`, params).catch(function(e) {
@@ -34,33 +37,10 @@ class MoulinetteClient {
   async put(URI) { return this.send(URI, "PUT") }
   async post(URI, data) { return this.send(URI, "POST", data) }
   async delete(URI, data) { return this.send(URI, "DELETE") }
-  
-  /*
-   * User login
-   */
-  async login() {
-    const login = game.settings.get("moulinette", "lcLogin")
-    const accessKey = game.settings.get("moulinette", "lcAccessKey")
-    if( !login || !accessKey ) {
-      return false
-    }
-    let data = {
-      login: login,
-      secret: accessKey
-    }
-    const response = await this.post('/login', data)
-    if( !response || response.status == 401 ) {
-      return false
-    }
-    
-    this.token = response.data.access_token
-    return true
-  }
-    
 }
 
 
-class Moulinette {
+export class Moulinette {
   
   static lastSelectedInitiative = 0
   static lastAuthor = ""
@@ -70,8 +50,47 @@ class Moulinette {
     this.type = type;
   }
   
-  static async showMoulinette() {
+  static showMoulinette() {
     new MoulinetteHome().render(true)
+  }
+  
+  static getSource() {
+    var source = "data";
+    if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
+        source = "forgevtt";
+    }
+    return source;
+  }
+  
+  /**
+   * Generates a new folder
+   */
+  static async createFolderIfMissing(target, folderPath) {
+    let base = await FilePicker.browse(Moulinette.getSource(), folderPath);
+    if (base.target == target)
+    {
+        await FilePicker.createDirectory(Moulinette.getSource(), folderPath);
+    }
+  }
+  
+  /**
+   * Download a files into the right folder
+   */
+  static async uploadIfNotExists(file, name, folderPath) {
+    const source = Moulinette.getSource()
+    Moulinette.createFolderIfMissing("moulinette", folderPath)
+    
+    // check if file already exist
+    let base = await FilePicker.browse(source, folderPath);
+    let exist = base.files.filter(f => f == `${folderPath}/${name}`)
+    if(exist.length > 0) return;
+    
+    try {
+      let response = await FilePicker.upload(source, folderPath, file, {});
+    } catch (e) {
+      console.log(`Moulinette | Not able to upload file ${name}`)
+      console.log(e)
+    }
   }
 };
 
@@ -107,26 +126,26 @@ class MoulinetteHome extends FormApplication {
   _onSelect(event) {
     event.preventDefault();
     const source = event.currentTarget;
-    if (source.classList.contains("market")) {
-      new MoulinetteMarket().render(true)
-    } else if (source.classList.contains("requests")) {
-      console.log("requests")
+    if (source.classList.contains("forge")) {
+      new MoulinetteForge().render(true)
+    } else if (source.classList.contains("config")) {
+      ui.notifications.error(game.i18n.format("ERROR.mtteNotYetAvailable"));
     }
   }
 }
 
 
 /*************************
- * Community Market
+ * Moulinette Forge
  *************************/
-class MoulinetteMarket extends FormApplication {
+class MoulinetteForge extends FormApplication {
   
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       id: "moulinette",
-      classes: ["mtte", "market"],
-      title: game.i18n.localize("mtte.communityMarket"),
-      template: "modules/fvtt-moulinette/templates/market.html",
+      classes: ["mtte", "forge"],
+      title: game.i18n.localize("mtte.moulinetteForge"),
+      template: "modules/fvtt-moulinette/templates/forge.html",
       width: 600,
       height: "auto",
       closeOnSubmit: false,
@@ -175,6 +194,12 @@ class MoulinetteMarket extends FormApplication {
     
   }
   
+  _displayMessage(text, type="success") {
+    if(this.msgbox) {
+      this.msgbox.addClass(type).css('visibility', 'visible').find('.message').text(text); 
+    }
+  }
+  
   _hideMessagebox(event) {
     if(this.msgbox) {
       this.msgbox.css('visibility', 'hidden'); 
@@ -192,32 +217,97 @@ class MoulinetteMarket extends FormApplication {
   
   async _updateObject(event, inputs) {
     event.preventDefault();
-    console.log(this.lists)
-    if(!this.lists || !this.lists.scenes || !this.msgbox) {
+    if(!this.lists || !this.lists.scenes) {
       return;
     }
     
     const selected = this.lists.scenes.filter( sc => sc.id in inputs && inputs[sc.id] )
     if(selected.length == 0) {
-      this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.mtteSelectAtLeastOne"));
+      this._displayMessage(game.i18n.localize("ERROR.mtteSelectAtLeastOne"), 'error')
+      
     } else if (selected.length > 3) {
-      this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.mtteTooMany"));
+      this._displayMessage(game.i18n.localize("ERROR.mtteTooMany"), 'error')
+    } else if (this.inProgress) {
+      ui.notifications.error(game.i18n.format("ERROR.mtteInProgress"));
     } else {
-      // submit request
-      const moduleName = "FoundryVTT"
-      let userId = game.settings.get("moulinette", "userId", "")
+      this.inProgress = true
       let client = new MoulinetteClient()
-      let data = { userId: userId, module: moduleName }
-      selected.forEach( s => data[s.id] = true )
-      let response = await client.post("/v2/bundler/fvtt/task", data)
-      if(response.status == 200) {
-        this.msgbox.addClass('success').css('visibility', 'visible').find('.message').text(game.i18n.localize("mtte.requestSuccessful"));
-      } else if(response.status == 403) {
-        this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.tooManyRequests"));
-      } else {
-        console.log("Moulinette | Response from server", response)
-        this.msgbox.addClass('error').css('visibility', 'visible').find('.message').text(game.i18n.localize("ERROR.requestFailed"));
+      
+      try {
+        // iterate on each desired request
+        for( const r of selected ) {
+          const response = await fetch(`${MoulinetteClient.GITHUB_SRC}/main/${r.url}`).catch(function(e) {
+            console.log(`Moulinette | Not able to fetch JSON for pack ${r.name}`, e)
+          });
+          if(!response) continue;
+          const pack = await response.json()
+          
+          // retrieve all scenes from pack
+          for( const sc of pack.list ) {
+            
+            // retrieve scene JSON
+            const response = await fetch(`${MoulinetteClient.GITHUB_SRC}/${sc.data}`).catch(function(e) {
+              console.log(`Moulinette | Not able to fetch scene of pack ${pack.name}`, e)
+            });
+            if(!response) continue;
+            const scene = await response.json()
+            
+            // retrieve and upload scene image
+            let proxyImg = null
+            let res = null
+            
+            // change message to show progress (specially for image download/upload)
+            if(pack.list.length == 1) {
+              this._displayMessage(game.i18n.format("mtte.forgingItem", { pack: pack.name}), 'success')
+            } else {
+              this._displayMessage(game.i18n.format("mtte.forgingItemMultiple", { pack: pack.name, scene: scene.name}), 'success')
+            }
+              
+            if(!sc.convert) { // no conversion required => try direct download
+              try {
+                res = await fetch(sc.url, {})
+              } catch(e) {}
+            }
+            
+            if(!res) {
+              console.log("Moulinette | Direct download not working. Using proxy...")
+              const proxy = await client.get(`/bundler/fvtt/image/${pack.id}/${sc.name}`)
+              if(!proxy || proxy.status != 200) {
+                console.log("Moulinette | Proxy download not working. Skip.")
+                continue;
+              }
+              res = await fetch(proxy.data.url, {})
+              proxyImg = proxy.data.guid
+              
+              // replace filename using new extension
+              const oldExt = sc.name.split('.').pop(); 
+              const newExt = proxy.data.url.split('.').pop(); 
+              sc.name = sc.name.substring(0, sc.name.length - oldExt.length) + newExt
+            }
+            
+            const blob = await res.blob()
+            await Moulinette.uploadIfNotExists(new File([blob], sc.name), sc.name, `moulinette/${pack.id}`)
+            if(proxyImg) {
+              await client.delete(`/bundler/fvtt/image/${proxyImg}`)
+            }
+            
+            // adapt scene and create
+            if(pack.list.length == 1) scene.name = pack.name
+            scene.img = `moulinette/${pack.id}/${sc.name}`
+            scene.tiles = []
+            scene.sounds = []
+            let newScene = await Scene.create(scene);
+            let tData = await newScene.createThumbnail()
+            await newScene.update({thumb: tData.thumb});
+          }
+        }
+        
+        this._displayMessage(game.i18n.localize("mtte.forgingSuccess"), 'success')
+      } catch(e) {
+        console.log(`Moulinette | Unhandled exception`, e)
+        this._displayMessage(game.i18n.localize("mtte.forgingFailure"), 'error')
       }
+      this.inProgress = false
     }
   }
 }
@@ -246,8 +336,7 @@ class MoulinettePreviewer extends FormApplication {
     });
   }
   
-  async getData() {
-    
+  async getData() {    
   }
 
   activateListeners(html) {
@@ -259,4 +348,46 @@ class MoulinettePreviewer extends FormApplication {
   
 }
 
-
+// /*************************
+//  * Forge (requests)
+//  *************************/
+// class MoulinetteForge extends FormApplication {
+//   
+//   static get defaultOptions() {
+//     return mergeObject(super.defaultOptions, {
+//       id: "moulinette",
+//       classes: ["mtte", "forge"],
+//       title: game.i18n.localize("mtte.moulinetteForge"),
+//       template: "modules/fvtt-moulinette/templates/forge.html",
+//       width: 600,
+//       height: "auto",
+//       closeOnSubmit: false,
+//       submitOnClose: false,
+//     });
+//   }
+//   
+//   async getData() {
+//     if (!game.user.isGM) {
+//       return { error: game.i18n.localize("ERROR.mtteGMOnly") }
+//     }
+//     
+//     let client = new MoulinetteClient()
+//     var source = "data";
+//     if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
+//         source = "forgevtt";
+//     }
+//     const file = {isExternalUrl: true, url: MoulinetteClient.SERVER_OUT + "10232be5-b93b-4757-b0eb-88e53922a15b.zip", name: "test.zip"}
+//     try {
+//       console.log(FilePicker)
+//       let response = await FilePicker.upload(source, "moulinette-data", file, {});
+//     } catch (e) {
+//       console.log(e)
+//     }
+//     
+//   }
+// 
+//   activateListeners(html) {
+//     super.activateListeners(html);
+//   }
+// }
+// 
