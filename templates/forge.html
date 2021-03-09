@@ -12,9 +12,12 @@
         <div id="scenePacks" class="list">
         {{#each lists.scenes as |sc|}}
           <div for="{{sc.name}}" class="pack" title="{{sc.description}}">
-            <input type="checkbox" class="check" name="{{sc.id}}" value="{{sc.url}}">
-            {{sc.name}} 
-            <i class="preview fas fa-eye"  data-id="{{sc.filename}}" title="{{localize "mtte.preview"}}"></i>
+            <div class="scene">
+              <input type="checkbox" class="check" name="{{sc.id}}" value="{{sc.url}}">
+              {{sc.name}} 
+              <i class="preview fas fa-eye"  data-id="{{sc.filename}}" title="{{localize "mtte.preview"}}"></i>
+            </div>
+            <a href="{{sc.source.url}}" target="_blank">{{sc.source.name}}</a>
           </div>
         {{/each}}
         </div>

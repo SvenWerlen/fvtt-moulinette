@@ -15,8 +15,8 @@
     "mtte.clickToClose": "Click anywhere to close preview window",
     "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
     
-    "mtte.forgingItem": "Forging {pack} ...",
-    "mtte.forgingItemMultiple": "Forging {pack} ({scene}) ...",
+    "mtte.forgingItem": "Forging {pack} ... please wait!",
+    "mtte.forgingItemMultiple": "Forging {pack} ({scene}) ... please wait!",
     "mtte.forgingSuccess": "Items were successfully forged!",
     "mtte.forgingFailure": "Something went bad. Report it to Moulinette Discord",
     

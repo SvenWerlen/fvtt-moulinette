@@ -4,12 +4,12 @@
  */
 class MoulinetteClient {
   
-  static SERVER_URL = "http://127.0.0.1:5000"
-  static SERVER_OUT = "http://127.0.0.1:5000/static/out/"
+  //static SERVER_URL = "http://127.0.0.1:5000"
+  //static SERVER_OUT = "http://127.0.0.1:5000/static/out/"
   static GITHUB_SRC = "https://raw.githubusercontent.com/SvenWerlen/moulinette-data"
   
-  //static SERVER_URL = "https://boisdechet.org/moulinette"
-  //static SERVER_OUT = "https://boisdechet.org/moulinette/out/"
+  static SERVER_URL = "https://boisdechet.org/moulinette"
+  static SERVER_OUT = "https://boisdechet.org/moulinette/static/out/"
   static HEADERS = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
   
   token = null
@@ -160,8 +160,9 @@ class MoulinetteForge extends FormApplication {
     
     let client = new MoulinetteClient()
     let lists = await client.get("/bundler/fvtt/packs")
-    if( lists.status == 200 ) {
+    if( lists && lists.status == 200 ) {
       this.lists = lists.data
+      this.lists.scenes.forEach( sc => sc.source = { name: sc.source.split('|')[0], url: sc.source.split('|')[1] })
       return { lists: this.lists }
     } else {
       console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
@@ -220,6 +221,8 @@ class MoulinetteForge extends FormApplication {
     if(!this.lists || !this.lists.scenes) {
       return;
     }
+    
+    ui.scenes.activate() // give focus to scenes
     
     const selected = this.lists.scenes.filter( sc => sc.id in inputs && inputs[sc.id] )
     if(selected.length == 0) {

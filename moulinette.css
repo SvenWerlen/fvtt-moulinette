@@ -57,6 +57,11 @@
   background-color: #666;
   color: #eee;
 }
+
+.mtte .scene { 
+  float: left; 
+  width: 400px;
+}
   
 .mtte .thumb { 
   overflow: hidden;
