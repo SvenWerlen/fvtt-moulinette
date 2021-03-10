@@ -44,12 +44,12 @@
   margin: 1px 3px;
 }
 
-.mtte .pack {
+.mtte .list .pack {
   display:flex;
   align-items:center;
 }
 
-.mtte .list > div:nth-of-type(odd) {
+.mtte .list .pack.alt {
   background: rgba(180, 180, 180, 0.73);
 }
 
@@ -59,7 +59,6 @@
 }
 
 .mtte .scene { 
-  float: left; 
   width: 400px;
 }
   

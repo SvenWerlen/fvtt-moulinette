@@ -12,11 +12,11 @@
         <div id="scenePacks" class="list">
         {{#each lists.scenes as |sc|}}
           <div for="{{sc.name}}" class="pack" title="{{sc.description}}">
-            <div class="scene">
+            <span class="scene">
               <input type="checkbox" class="check" name="{{sc.id}}" value="{{sc.url}}">
-              {{sc.name}} 
+              {{sc.name}} <small>({{sc.scenesCount}})</small>
               <i class="preview fas fa-eye"  data-id="{{sc.filename}}" title="{{localize "mtte.preview"}}"></i>
-            </div>
+            </span>
             <a href="{{sc.source.url}}" target="_blank">{{sc.source.name}}</a>
           </div>
         {{/each}}
