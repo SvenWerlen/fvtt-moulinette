@@ -1,0 +1,39 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+  <p>{{localize "mtte.shareWelcome"}}</p>
+  {{#if error}}
+  <div class="error">{{error}}</div>
+  {{/if}}
+  <div class="form-group">
+    <label><b>{{localize "mtte.sceneName"}}</b></label>
+    <label><input class="sceneName" type="text" name="sceneName" value="{{sceneName}}" maxLength="20" /></label>
+  </div>
+  <div class="form-group">
+    <label><b>{{localize "mtte.sceneDesc"}}</b> <i class="fas fa-question-circle" title="{{localize "mtte.sceneDescToolTip"}}"></i></label>
+    <label><input class="sceneDesc" type="text" name="sceneDesc" value="{{sceneDesc}}" maxLength="30" /></label>
+  </div>
+  <div class="form-group">
+    <label><b>{{localize "mtte.authorImg"}}</b> <i class="fas fa-question-circle" title="{{localize "mtte.authorImgToolTip"}}"></i></label></label>
+    <label><input class="authorImg" type="text" name="authorImg" value="{{authorImg}}" maxLength="50" /></label>
+  </div>
+  <div class="form-group">
+    <label><b>{{localize "mtte.imageURL"}}</b> <i class="fas fa-question-circle" title="{{localize "mtte.imageURLToolTip"}}"></i></label></label>
+    <label><input class="imageURL" type="text" name="imageURL" value="{{imageURL}}" maxLength="100" /></label>
+  </div>
+  <div class="form-group">
+    <label><b>{{localize "mtte.discordId"}}</b> <i class="fas fa-question-circle" title="{{localize "mtte.discordIdToolTip"}}"></i></label></label>
+    <label><input class="discordId" type="text" name="discordId"  value="{{discordId}}" maxLength="20" /></label>
+  </div>
+  <div class="form-group">
+    <label class="agree"><input class="agree1" type="checkbox" name="agree1" value="1" /> {{localize "mtte.shareAgree1"}} <a href="https://github.com/SvenWerlen/moulinette-data/issues/new" target="_blank">GitHub</a>. {{localize "mtte.shareAgree2"}}</label>
+  </div>
+  <div class="form-group">
+    <label class="agree"><input class="agree2" type="checkbox" name="agree2" value="1" /> {{localize "mtte.shareAgree3"}}</label>
+  </div>
+  <p>
+    <div class="actions"><input type="submit" value="{{localize "mtte.shareButton"}}" /></div>
+  </p>
+  <p><em>
+    <a href="https://github.com/SvenWerlen/moulinette">{{localize "mtte.seeDoc"}}</a> {{localize "mtte.learnMore"}}
+  </em></p>
+  
+</form>

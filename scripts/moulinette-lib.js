@@ -54,6 +54,10 @@ export class Moulinette {
     new MoulinetteHome().render(true)
   }
   
+  static shareWithMoulinette(scene) {
+    new MoulinetteShare(scene).render(true)
+  }
+  
   static getSource() {
     var source = "data";
     if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
@@ -356,6 +360,93 @@ class MoulinettePreviewer extends FormApplication {
     html.find(".thumb").css('background', `url(${this.data.thumb}) 50% 50% no-repeat`)
     const window = this;
     html.click(function() { window.close() });
+  }
+  
+}
+
+/*************************
+ * Share
+ *************************/
+class MoulinetteShare extends FormApplication {
+  
+  constructor(scene) {
+    super()
+    this.scene = scene;
+  }
+  
+  static get defaultOptions() {
+    return mergeObject(super.defaultOptions, {
+      id: "moulinette-share",
+      classes: ["mtte", "share"],
+      title: game.i18n.localize("mtte.share"),
+      template: "modules/fvtt-moulinette/templates/share.html",
+      width: 500,
+      height: 470,
+      closeOnSubmit: false,
+      submitOnClose: false,
+    });
+  }
+  
+  async getData() {
+    const authorImg = game.settings.get("moulinette", "shareImgAuthor")
+    const discordId = game.settings.get("moulinette", "shareDiscordId") 
+    console.log(authorImg, discordId)
+    return { sceneName: this.scene.name, authorImg: authorImg != "undefined" ? authorImg : "", discordId: discordId != "undefined" ? discordId : "" };
+  }
+
+  activateListeners(html) {
+    super.activateListeners(html);
+  }
+  
+  async _updateObject(event, inputs) {
+    event.preventDefault();
+    if(!inputs.sceneName || inputs.sceneName.length == 0) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteMandatorySceneName"));
+    }
+    else if(!inputs.sceneDesc || inputs.sceneDesc.length == 0) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteMandatorySceneDesc"));
+    }
+    else if(!inputs.authorImg || inputs.authorImg.length == 0) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteAuthorImg"));
+    }
+    else if(!inputs.imageURL || inputs.imageURL.length == 0) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteImageURL"));
+    }
+    else if(!inputs.agree1 || !inputs.agree2) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteMustAgree"));
+    }
+    else if(!inputs.discordId || inputs.discordId.length == 0) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteDiscordId"));
+    }
+    
+    // store settings
+    game.settings.set("moulinette", "shareImgAuthor", inputs.authorImg)
+    game.settings.set("moulinette", "shareDiscordId", inputs.discordId)  
+    
+    // cleanup data before sending
+    let data = this.scene.data
+    delete data.thumb
+    delete data._priorThumbPath
+    
+    // submit contribution
+    let client = new MoulinetteClient()
+    const result = await client.post(`/bundler/fvtt/scene`, {
+      guid: game.settings.get("moulinette", "userId"),
+      scene: this.scene,
+      sceneName: inputs.sceneName,
+      sceneDesc: inputs.sceneDesc,
+      authorImg: inputs.authorImg,
+      imageURL: inputs.imageURL,
+      discordId: inputs.discordId
+    })
+    console.log(result)
+    if(result.status != 200) {
+      console.log("Moulinette | Sharing failed with error: " + result.data.error)
+      return ui.notifications.error(game.i18n.format("ERROR.mtteUnexpected"));
+    } else {
+      return ui.notifications.info(game.i18n.format("mtte.shareSuccess"));
+      this.close()
+    }
   }
   
 }

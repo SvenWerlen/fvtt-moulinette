@@ -94,3 +94,9 @@
 .mtte .messagebox.success {
   color: darkgreen;
 }
+
+.mtte .agree {
+  line-height: 16px;
+  font-size: smaller;
+  text-align: justify;
+}
