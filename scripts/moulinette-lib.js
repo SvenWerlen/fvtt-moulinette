@@ -352,7 +352,8 @@ class MoulinettePreviewer extends FormApplication {
     });
   }
   
-  async getData() {    
+  async getData() { 
+    return this.data
   }
 
   activateListeners(html) {
@@ -381,7 +382,7 @@ class MoulinetteShare extends FormApplication {
       title: game.i18n.localize("mtte.share"),
       template: "modules/fvtt-moulinette/templates/share.html",
       width: 500,
-      height: 470,
+      height: 500,
       closeOnSubmit: false,
       submitOnClose: false,
     });
@@ -396,6 +397,21 @@ class MoulinetteShare extends FormApplication {
 
   activateListeners(html) {
     super.activateListeners(html);
+    
+    html.find("input.sceneName").on("keyup", function() { html.find("#scenePacks .sceneName").text($(this).val()) })
+    html.find("input.sceneDesc").on("keyup", function() { html.find("#scenePacks .pack").attr('title',$(this).val()) })
+    html.find("input.authorImg").on("keyup", function() { html.find("#scenePacks .authorImg").text($(this).val()) })
+    html.find("input.authorURL").on("keyup", function() { html.find("#scenePacks .authorImg").attr('href',$(this).val()) })
+    html.find("input.imageURL").on("keyup", function() { html.find("#scenePacks .preview").attr('data-id', $(this).val()) })
+    html.find(".preview").click(this._onPreview.bind(this));
+  }
+  
+  _onPreview(event) {
+    event.preventDefault();
+    const source = event.currentTarget;
+    const sceneURL = source.dataset.id;
+    const thumbURL = sceneURL
+    new MoulinettePreviewer({ thumb: thumbURL, resize: true}).render(true)
   }
   
   async _updateObject(event, inputs) {
@@ -408,6 +424,9 @@ class MoulinetteShare extends FormApplication {
     }
     else if(!inputs.authorImg || inputs.authorImg.length == 0) {
       return ui.notifications.error(game.i18n.format("ERROR.mtteAuthorImg"));
+    }
+    else if(!inputs.authorURL || inputs.authorURL.length == 0) {
+      return ui.notifications.error(game.i18n.format("ERROR.mtteAuthorURL"));
     }
     else if(!inputs.imageURL || inputs.imageURL.length == 0) {
       return ui.notifications.error(game.i18n.format("ERROR.mtteImageURL"));
@@ -435,7 +454,7 @@ class MoulinetteShare extends FormApplication {
       scene: this.scene,
       sceneName: inputs.sceneName,
       sceneDesc: inputs.sceneDesc,
-      authorImg: inputs.authorImg,
+      authorImg: `${inputs.authorImg}|${inputs.authorURL}`,
       imageURL: inputs.imageURL,
       discordId: inputs.discordId
     })

@@ -27,6 +27,12 @@
   margin-top: 5px;
 }
 
+.mtte.share .list {
+  height: 22px;
+  overflow-y: hidden;
+  margin-top: 5px;
+}
+
 .mtte .logo {
   float: left;
   padding-right: 10px;
