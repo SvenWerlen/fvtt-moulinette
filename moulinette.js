@@ -18,7 +18,8 @@ Hooks.once("init", async function () {
 Hooks.once("ready", async function () {
   if (game.user.isGM) {
     await Moulinette.createFolderIfMissing(".", "moulinette");
-    //await createFolderIfMissing("moulinette", "mo/uploaded");
+    await Moulinette.createFolderIfMissing("moulinette", "moulinette/scenes");
+    console.log("here")
   }   
 });
 

@@ -40,6 +40,11 @@
     "mtte.shareSuccess": "The scene successfully shared with Moulinette. Thank you for your contribution!",
     "mtte.sharePreview": "Check preview below before submitting",
     
+    "mtte.clear": "clear",
+    "mtte.packs": "packs",
+    "mtte.scenes": "scenes",
+    "mtte.search": "Type something to filter list",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",

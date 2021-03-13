@@ -79,9 +79,9 @@ export class Moulinette {
   /**
    * Download a files into the right folder
    */
-  static async uploadIfNotExists(file, name, folderPath) {
+  static async uploadIfNotExists(file, name, folderSrc, folderPath) {
     const source = Moulinette.getSource()
-    Moulinette.createFolderIfMissing("moulinette", folderPath)
+    Moulinette.createFolderIfMissing(folderSrc, folderPath)
     
     // check if file already exist
     let base = await FilePicker.browse(source, folderPath);
@@ -165,8 +165,12 @@ class MoulinetteForge extends FormApplication {
     let lists = await client.get("/bundler/fvtt/packs")
     if( lists && lists.status == 200 ) {
       this.lists = lists.data
-      this.lists.scenes.forEach( sc => sc.source = { name: sc.source.split('|')[0], url: sc.source.split('|')[1] })
-      return { lists: this.lists }
+      let scCount = 0;
+      this.lists.scenes.forEach( sc => { 
+        sc.source = { name: sc.source.split('|')[0], url: sc.source.split('|')[1] } 
+        scCount += sc.scenesCount
+      })
+      return { lists: this.lists, scCount: scCount }
     } else {
       console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
       return { error: game.i18n.localize("ERROR.mtteServerCommunication") }
@@ -203,6 +207,7 @@ class MoulinetteForge extends FormApplication {
   }
   
   _alternateColors() {
+    $('#scenePacks .pack').removeClass("alt");
     $('#scenePacks .pack:even').addClass("alt");
   }
   
@@ -300,14 +305,14 @@ class MoulinetteForge extends FormApplication {
             }
             
             const blob = await res.blob()
-            await Moulinette.uploadIfNotExists(new File([blob], sc.name, { type: blob.type, lastModified: new Date() }), sc.name, `moulinette/${pack.id}`)
+            await Moulinette.uploadIfNotExists(new File([blob], sc.name, { type: blob.type, lastModified: new Date() }), sc.name, "moulinette/scenes", `moulinette/scenes/${pack.id}`)
             if(proxyImg) {
               client.delete(`/bundler/fvtt/image/${proxyImg}`)
             }
             
             // adapt scene and create
             if(pack.list.length == 1) scene.name = pack.name
-            scene.img = `moulinette/${pack.id}/${sc.name}`
+            scene.img = `moulinette/scenes/${pack.id}/${sc.name}`
             scene.tiles = []
             scene.sounds = []
             let newScene = await Scene.create(scene);
@@ -323,7 +328,7 @@ class MoulinetteForge extends FormApplication {
         this._displayMessage(game.i18n.localize("mtte.forgingFailure"), 'error')
       }
       this.inProgress = false
-      this.render();
+      //this.render();
     }
   }
 }
@@ -463,8 +468,9 @@ class MoulinetteShare extends FormApplication {
       console.log("Moulinette | Sharing failed with error: " + result.data.error)
       return ui.notifications.error(game.i18n.format("ERROR.mtteUnexpected"));
     } else {
-      return ui.notifications.info(game.i18n.format("mtte.shareSuccess"));
+      ui.notifications.info(game.i18n.format("mtte.shareSuccess"));
       this.close()
+      return;
     }
   }
   

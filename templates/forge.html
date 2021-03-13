@@ -8,7 +8,7 @@
       <p>
         <h3>Scenes</h3>
         <div class="description">Scenes currently available for Moulinette. See <a href="https://github.com/SvenWerlen/moulinette-data/tree/main/scenes" target="_blank">scenes</a>.</div>
-        <div class="search"><input id="searchScenes" type="text" placeholder="{{lists.scenes.length}} packs. Type something to filter list"></input></div>
+        <div class="search"><input id="searchScenes" type="text" placeholder="{{lists.scenes.length}} {{localize "mtte.packs"}} ({{scCount}} {{localize "mtte.scenes"}}). {{localize "mtte.search"}}"></input></div>
         <div id="scenePacks" class="list">
         {{#each lists.scenes as |sc|}}
           <div for="{{sc.name}}" class="pack" title="{{sc.description}}">
@@ -23,6 +23,7 @@
         </div>
       </p>
       <p>
+        <div class="actions"><input type="reset" value="{{localize "mtte.clear"}}" /></div>
         <div class="actions"><input type="submit" value="{{localize "mtte.forge"}}" /></div>
         <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
       </p>
