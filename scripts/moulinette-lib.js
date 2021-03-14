@@ -588,26 +588,29 @@ class MoulinetteScribe extends FormApplication {
     html.find("#filterCore").click(this._toggleCore.bind(this))
     html.find("#filterBabele").click(this._toggleBabele.bind(this))
     
+    // buttons
+    html.find("button").click(this._checkUpdates.bind(this))
+    
     // enable alt _alternateColors
     this._alternateColors()
   }
   
-  _toggleFilter() {
+  _toggleFilter(event) {
     this.onlyMyNeed = !this.onlyMyNeed;
     this.render()
   }
   
-  _toggleFilterLang() {
+  _toggleFilterLang(event) {
     this.onlyMyLang = !this.onlyMyLang;
     this.render()
   }
   
-  _toggleCore() {
+  _toggleCore(event) {
     this.includeCore = !this.includeCore;
     this.render()
   }
   
-  _toggleBabele() {
+  _toggleBabele(event) {
     this.includeBabele = !this.includeBabele;
     this.render()
   }
@@ -628,12 +631,37 @@ class MoulinetteScribe extends FormApplication {
       this.msgbox.css('visibility', 'hidden'); 
     }
   }
+  
+  async _checkUpdates(event) {
+    event.preventDefault();
+    const source = event.currentTarget;
+    const window = this
+    if (source.classList.contains("update")) {      
+      let packInstalled = JSON.parse(game.settings.get("moulinette", "packInstalled"))
+      const selected = this.lists.transl.filter( ts => packInstalled.includes(ts.filename) )
+      let namesList = ""
+      selected.forEach(s => namesList += `<li>${s.name}</li>`)
+      Dialog.confirm({
+        title: game.i18n.localize("mtte.updateAction"),
+        content: game.i18n.format("mtte.updateContent", { count: selected.length }) + `<ul>${namesList}</ul>`,
+        yes: async function() {
+          window._installPacks(selected)
+        },
+        no: () => {}
+      });
+    }
+  }
  
   async _updateObject(event, inputs) {
     event.preventDefault();
-    
     const selected = this.lists.transl.filter( ts => ts.id in inputs && inputs[ts.id] )
-    
+    this._installPacks(selected)
+  }
+  
+  /**
+   * Downloads and installs all selected translations
+   */
+  async _installPacks(selected) {
     this.inProgress = true
     let client = new MoulinetteClient()
     
@@ -641,6 +669,9 @@ class MoulinetteScribe extends FormApplication {
     let coreInstalled = false
     
     try {
+      // installed packs
+      let packInstalled = JSON.parse(game.settings.get("moulinette", "packInstalled"))
+      
       // iterate on each desired request
       for( const r of selected ) {
         const response = await fetch(`${MoulinetteClient.GITHUB_SRC}/main${r.url}`).catch(function(e) {
@@ -653,6 +684,9 @@ class MoulinetteScribe extends FormApplication {
           ui.notifications.error(game.i18n.format("ERROR.mtteNoBabele"));
           continue;
         }
+        
+        // initialize progressbar
+        SceneNavigation._onLoadProgress(r.name,0);  
         
         // retrieve all translations from pack
         let idx = 0
@@ -679,6 +713,7 @@ class MoulinetteScribe extends FormApplication {
             const folder = `moulinette/transl/babele/${r["lang"]}`
             await Moulinette.upload(new File([blob], filename, { type: blob.type, lastModified: new Date() }), filename, "moulinette/transl/babele", folder, true)
             babeleInstalled = true
+            if(!packInstalled.includes(r.filename)) packInstalled.push(r.filename)
           } 
           // Core/system translation
           else if(r.type == "core-translation") {
@@ -686,10 +721,40 @@ class MoulinetteScribe extends FormApplication {
             const transFilename = `${r["filename"]}-${filename}`
             await Moulinette.upload(new File([blob], transFilename, { type: blob.type, lastModified: new Date() }), transFilename, "moulinette/transl/core", folder, true)
             coreInstalled = true
+            if(!packInstalled.includes(r.filename)) packInstalled.push(r.filename)
           }
           
+          // update progressbar
+          SceneNavigation._onLoadProgress(r.name, Math.round((idx / pack.list.length)*100));
         }
       }
+      
+      // cleanup installed packages (avoid two conflicting translations)
+      let core = []
+      let modules = []
+      let systems = []
+      let packInstalledClean = []
+      packInstalled.slice().reverse().forEach( installed => {
+        const pack = this.lists.transl.find( tr => tr.filename == installed )
+        if(!pack) return
+        if(pack.system && !systems.includes(`${pack.type}-${pack.lang}-${pack.system}`)) {
+          systems.push(`${pack.type}-${pack.lang}-${pack.system}`)
+          packInstalledClean.push(installed)
+        }
+        else if(pack.module && !modules.includes(`${pack.type}-${pack.lang}-${pack.module}`)) {
+          modules.push(`${pack.lang}-${pack.module}`)
+          packInstalledClean.push(installed)
+        } else if(!pack.module && !pack.system && !core.includes(pack.lang)) {
+          core.push(pack.lang)
+          packInstalledClean.push(installed)
+        } else {
+          console.log(`Moulinette | Translation ${installed} removed from list because in conflict with another`)
+        }
+      });
+      
+      
+      // store settings (installed packs)
+      game.settings.set("moulinette", "packInstalled", JSON.stringify(packInstalledClean))
       
       if(babeleInstalled) {
         game.settings.set('babele', 'directory', "moulinette/transl/babele")
@@ -717,5 +782,11 @@ class MoulinetteScribe extends FormApplication {
       console.log(`Moulinette | Unhandled exception`, e)
       this._displayMessage(game.i18n.localize("mtte.downloadFailure"), 'error')
     }
+    
+    // hide progressbar
+    SceneNavigation._onLoadProgress(game.i18n.localize("mtte.installingPacks"), 100);
   }
+    
 }
+
+

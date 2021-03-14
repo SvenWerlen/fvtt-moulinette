@@ -7,6 +7,7 @@ Hooks.once("init", async function () {
   game.settings.register("moulinette", "userId", { scope: "world", config: false, type: String, default: randomID(26) });
   game.settings.register("moulinette", "shareImgAuthor", { scope: "world", config: false, type: String });
   game.settings.register("moulinette", "shareDiscordId", { scope: "world", config: false, type: String });
+  game.settings.register("moulinette", "packInstalled", { scope: "world", config: false, type: String, default: "[]" })
   game.settings.register("moulinette", "coreLanguages", { scope: "world", config: false, type: String, default: "[]" })
   
   game.moulinette = {

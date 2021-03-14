@@ -53,15 +53,21 @@
     "mtte.filterCoreToolTip": "Include translations for core/systems",
     
     "mtte.currentlyAvailable": "currently available for Moulinette",
-    "mtte.clear": "clear",
+    "mtte.clear": "Clear",
     "mtte.packs": "Packs",
     "mtte.scenes": "Scenes",
     "mtte.see": "See",
     "mtte.search": "Type something to filter list",
     "mtte.scribeAction": "Scribe!",
+    "mtte.scribeActionToolTip": "Install all checked translations, configure Babele, and reloads page",
     "mtte.downloadSuccess": "Translations successfully installed! Reloading...",
     "mtte.downloadFailure": "Something went bad. Report it to Moulinette Discord",
-    "mtte.downloadCoreSuccess": "Translations successfully installed! You'll need restart your server.",
+    "mtte.downloadCoreSuccess": "Translations successfully installed! You'll need to refresh your page!",
+    
+    "mtte.updateAction": "Update installed translations",
+    "mtte.updateActionToolTip": "Checks if there is any update for translations that you installed with Moulinette",
+    "mtte.updateContent": "Moulinette will update the following {count} translation(s):<br/>",
+    "mtte.installingPacks": "Installing...",
     
     "mtte.lang.en": "English",
     "mtte.lang.fr": "French",
