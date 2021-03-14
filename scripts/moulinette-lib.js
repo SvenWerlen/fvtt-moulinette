@@ -4,20 +4,21 @@
  */
 class MoulinetteClient {
   
-  //static SERVER_URL = "http://127.0.0.1:5000"
-  //static SERVER_OUT = "http://127.0.0.1:5000/static/out/"
-  static SERVER_URL = "https://boisdechet.org/moulinette"
-  static SERVER_OUT = "https://boisdechet.org/moulinette/static/out/"
+  static SERVER_URL = "http://127.0.0.1:5000"
+  static SERVER_OUT = "http://127.0.0.1:5000/static/out/"
+  static GITHUB_SRC = "http://127.0.0.1:5000/static"
+  //static SERVER_URL = "https://boisdechet.org/moulinette"
+  //static SERVER_OUT = "https://boisdechet.org/moulinette/static/out/"
+  //static GITHUB_SRC = "https://raw.githubusercontent.com/SvenWerlen/moulinette-data"
   
-  static GITHUB_SRC = "https://raw.githubusercontent.com/SvenWerlen/moulinette-data"
   static HEADERS = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
   
   token = null
   
   /*
-   * Sends a request to server and return the response or null (if server unreachable)
+   * Sends a etch to server and return the response
    */
-  async send(URI, method, data) {
+  async fetch(URI, method, data) {
     let params = {
       method: method,
       headers: MoulinetteClient.HEADERS
@@ -27,11 +28,21 @@ class MoulinetteClient {
     const response = await fetch(`${MoulinetteClient.SERVER_URL}${URI}`, params).catch(function(e) {
       console.log(`Moulinette | Cannot establish connection to server ${MoulinetteClient.SERVER_URL}`, e)
     });
+    return response
+  }
+  
+  /*
+   * Sends a request to server and return the response or null (if server unreachable)
+   */
+  async send(URI, method, data) {
+    const response = await this.fetch(URI, method, data)
     if(!response) {
       return null;
     }
     return { 'status': response.status, 'data': await response.json() }
   }
+  
+  
   
   async get(URI) { return this.send(URI, "GET") }
   async put(URI) { return this.send(URI, "PUT") }
@@ -79,14 +90,14 @@ export class Moulinette {
   /**
    * Download a files into the right folder
    */
-  static async uploadIfNotExists(file, name, folderSrc, folderPath) {
+  static async upload(file, name, folderSrc, folderPath, overwrite = false) {
     const source = Moulinette.getSource()
     Moulinette.createFolderIfMissing(folderSrc, folderPath)
     
     // check if file already exist
     let base = await FilePicker.browse(source, folderPath);
     let exist = base.files.filter(f => f == `${folderPath}/${name}`)
-    //if(exist.length > 0) return;
+    if(exist.length > 0 && !overwrite) return;
     
     try {
       let response = await FilePicker.upload(source, folderPath, file, {bucket: null});
@@ -132,7 +143,7 @@ class MoulinetteHome extends FormApplication {
     if (source.classList.contains("forge")) {
       new MoulinetteForge().render(true)
     } else if (source.classList.contains("config")) {
-      ui.notifications.error(game.i18n.format("ERROR.mtteNotYetAvailable"));
+      new MoulinetteScribe().render(true)
     }
   }
 }
@@ -305,7 +316,7 @@ class MoulinetteForge extends FormApplication {
             }
             
             const blob = await res.blob()
-            await Moulinette.uploadIfNotExists(new File([blob], sc.name, { type: blob.type, lastModified: new Date() }), sc.name, "moulinette/scenes", `moulinette/scenes/${pack.id}`)
+            await Moulinette.upload(new File([blob], sc.name, { type: blob.type, lastModified: new Date() }), sc.name, "moulinette/scenes", `moulinette/scenes/${pack.id}`, false)
             if(proxyImg) {
               client.delete(`/bundler/fvtt/image/${proxyImg}`)
             }
@@ -474,4 +485,237 @@ class MoulinetteShare extends FormApplication {
     }
   }
   
+}
+
+
+/*************************
+ * Translations
+ *************************/
+class MoulinetteScribe extends FormApplication {
+  
+  constructor(scene) {
+    super()
+    this.onlyMyNeed = false;
+    this.onlyMyLang = false;
+    this.includeCore = true;
+    this.includeBabele = true;
+  }
+  
+  static get defaultOptions() {
+    return mergeObject(super.defaultOptions, {
+      id: "moulinette",
+      classes: ["mtte", "scribe"],
+      title: game.i18n.localize("mtte.moulinetteScribe"),
+      template: "modules/fvtt-moulinette/templates/scribe.html",
+      width: 600,
+      height: "auto",
+      closeOnSubmit: false,
+      submitOnClose: false,
+    });
+  }
+  
+  async getData() {
+    if (!game.user.isGM) {
+      return { error: game.i18n.localize("ERROR.mtteGMOnly") }
+    }
+    
+    let client = new MoulinetteClient()
+    let lists = await client.get("/bundler/fvtt/packs")
+    const lang = game.settings.get("core", "language")
+    const filterLang = game.i18n.format("mtte.filterLang", { lang: game.i18n.localize("mtte.lang." + lang) })
+    
+    // filter list
+    if(this.onlyMyNeed) {
+      const modules = game.modules.keys()
+      lists.data.transl = lists.data.transl.filter(t => (!t.system || t.system == game.system.id) && (!t.module || t.module in modules))
+    }
+    if(this.onlyMyLang) {
+      lists.data.transl = lists.data.transl.filter(t => t.lang == lang)
+    }
+    if(!this.includeCore) {
+      lists.data.transl = lists.data.transl.filter(t => t.type != "core-translation")
+    }
+    if(!this.includeBabele) {
+      lists.data.transl = lists.data.transl.filter(t => t.type != "babele-translation")
+    }
+    // prepare
+    if( lists && lists.status == 200 ) {
+      this.lists = lists.data
+      let scCount = 0;
+      this.lists.transl.forEach( tr => {
+        tr.source = { name: tr.source.split('|')[0], url: tr.source.split('|')[1] }
+        tr.name = `(${game.i18n.localize("mtte.lang." + tr.lang)}) ${tr.name}`
+      })
+      return { 
+        filterModSysEnabled: this.onlyMyNeed, 
+        filterLangEnabled: this.onlyMyLang, 
+        filterCore: this.includeCore, 
+        filterBabele: this.includeBabele, 
+        filterLang: filterLang,
+        lists: this.lists 
+      }
+    } else {
+      console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
+      return { error: game.i18n.localize("ERROR.mtteServerCommunication") }
+    }
+  }
+
+  activateListeners(html) {
+    super.activateListeners(html);
+    const window = this;
+  
+    // filter function
+    html.find("#searchTransl").on("keyup", function() {
+      let filter = $(this).val().toLowerCase()
+      $('#translPacks *').filter('.pack').each(function() {
+        const text = $(this).text().trim().toLowerCase() + $(this).attr("title");
+        $(this).css('display', text.length == 0 || text.indexOf(filter) >= 0 ? 'flex' : 'none')
+      });
+      window._alternateColors();
+      window._hideMessagebox();
+    });
+    
+    // keep messagebox reference for _updateObject
+    this.msgbox = html.find(".messagebox")
+    this.html = html
+    
+    // hide error/success message on anychange
+    html.find(".check").click(this._hideMessagebox.bind(this));
+    
+    // toggle filters
+    html.find("#filterModSys").click(this._toggleFilter.bind(this))
+    html.find("#filterLang").click(this._toggleFilterLang.bind(this))
+    html.find("#filterCore").click(this._toggleCore.bind(this))
+    html.find("#filterBabele").click(this._toggleBabele.bind(this))
+    
+    // enable alt _alternateColors
+    this._alternateColors()
+  }
+  
+  _toggleFilter() {
+    this.onlyMyNeed = !this.onlyMyNeed;
+    this.render()
+  }
+  
+  _toggleFilterLang() {
+    this.onlyMyLang = !this.onlyMyLang;
+    this.render()
+  }
+  
+  _toggleCore() {
+    this.includeCore = !this.includeCore;
+    this.render()
+  }
+  
+  _toggleBabele() {
+    this.includeBabele = !this.includeBabele;
+    this.render()
+  }
+  
+  _alternateColors() {
+    $('#translPacks .pack').removeClass("alt");
+    $('#translPacks .pack:even').addClass("alt");
+  }
+  
+  _displayMessage(text, type="success") {
+    if(this.msgbox) {
+      this.msgbox.addClass(type).css('visibility', 'visible').find('.message').text(text); 
+    }
+  }
+  
+  _hideMessagebox(event) {
+    if(this.msgbox) {
+      this.msgbox.css('visibility', 'hidden'); 
+    }
+  }
+ 
+  async _updateObject(event, inputs) {
+    event.preventDefault();
+    
+    const selected = this.lists.transl.filter( ts => ts.id in inputs && inputs[ts.id] )
+    
+    this.inProgress = true
+    let client = new MoulinetteClient()
+    
+    let babeleInstalled = false
+    let coreInstalled = false
+    
+    try {
+      // iterate on each desired request
+      for( const r of selected ) {
+        const response = await fetch(`${MoulinetteClient.GITHUB_SRC}/main${r.url}`).catch(function(e) {
+          console.log(`Moulinette | Not able to fetch JSON for pack ${r.name}`, e)
+        });
+        if(!response) continue;
+        const pack = await response.json()
+        
+        if(r.type == "babele-translation" && (!"babele" in game.modules.keys() || !game.modules.get("babele").active)) {
+          ui.notifications.error(game.i18n.format("ERROR.mtteNoBabele"));
+          continue;
+        }
+        
+        // retrieve all translations from pack
+        let idx = 0
+        for( const ts of pack.list ) {
+          idx++;
+          
+          // retrieve transl JSON
+          const filename = ts.url.split('/').pop()
+          let response = await fetch(`${ts.url}`).catch(function(e) {
+            console.log(`Moulinette | Not able to fetch translation of pack ${pack.name}`, e)
+          });
+          if(!response) {
+            console.log("Moulinette | Direct download not working. Using proxy...")
+            response = await client.fetch(`/bundler/fvtt/transl/${pack.id}/${idx-1}`)
+            if(!response) {
+              console.log("Moulinette | Proxy download not working. Skip.")
+              continue;
+            }
+          }
+          const blob = await response.blob()
+          
+          // Babele translations
+          if(r.type == "babele-translation") {
+            const folder = `moulinette/transl/babele/${r["lang"]}`
+            await Moulinette.upload(new File([blob], filename, { type: blob.type, lastModified: new Date() }), filename, "moulinette/transl/babele", folder, true)
+            babeleInstalled = true
+          } 
+          // Core/system translation
+          else if(r.type == "core-translation") {
+            const folder = `moulinette/transl/core/${r["lang"]}`
+            const transFilename = `${r["filename"]}-${filename}`
+            await Moulinette.upload(new File([blob], transFilename, { type: blob.type, lastModified: new Date() }), transFilename, "moulinette/transl/core", folder, true)
+            coreInstalled = true
+          }
+          
+        }
+      }
+      
+      if(babeleInstalled) {
+        game.settings.set('babele', 'directory', "moulinette/transl/babele")
+        this._displayMessage(game.i18n.localize("mtte.downloadSuccess"), 'success')
+      } 
+      if(coreInstalled) {
+        let languages = []
+        let browse = await FilePicker.browse(Moulinette.getSource(), "moulinette/transl/core");
+        for( const d of browse.dirs ) {
+          const lang = d.split('/').pop()
+          const data = await FilePicker.browse(Moulinette.getSource(), d, {'extensions': ['.json']});
+          data.files.forEach( f => {
+            languages.push( {
+              "lang": lang,
+              "name": game.i18n.localize("mtte.lang." + lang),
+              "path": f
+            })
+          });
+        }
+        game.settings.set("moulinette", "coreLanguages", JSON.stringify(languages))
+        this._displayMessage(game.i18n.localize("mtte.downloadCoreSuccess"), 'success')
+      }
+      
+    } catch(e) {
+      console.log(`Moulinette | Unhandled exception`, e)
+      this._displayMessage(game.i18n.localize("mtte.downloadFailure"), 'error')
+    }
+  }
 }

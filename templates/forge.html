@@ -6,8 +6,8 @@
   {{#unless error}}
     <div class="main">
       <p>
-        <h3>Scenes</h3>
-        <div class="description">Scenes currently available for Moulinette. See <a href="https://github.com/SvenWerlen/moulinette-data/tree/main/scenes" target="_blank">scenes</a>.</div>
+        <h3>{{localize "mtte.scenes"}}</h3>
+        <div class="description">{{localize "mtte.scenes"}} {{localize "mtte.currentlyAvailable"}}. {{localize "mtte.see"}} <a href="https://github.com/SvenWerlen/moulinette-data/tree/main/scenes" target="_blank">{{localize "mtte.scenes"}}</a>.</div>
         <div class="search"><input id="searchScenes" type="text" placeholder="{{lists.scenes.length}} {{localize "mtte.packs"}} ({{scCount}} {{localize "mtte.scenes"}}). {{localize "mtte.search"}}"></input></div>
         <div id="scenePacks" class="list">
         {{#each lists.scenes as |sc|}}

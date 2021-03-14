@@ -4,6 +4,8 @@
 
 .mtte td {
   text-align: center;
+  padding: 0px 5px;
+  width: 50%;
 }
 
 .mtte img.button {
@@ -64,7 +66,7 @@
   color: #eee;
 }
 
-.mtte .scene { 
+.mtte .scene, .mtte .transl { 
   width: 400px;
 }
   

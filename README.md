@@ -1,13 +1,18 @@
 # Moulinette for Foundry VTT
 
-Moulinette is a set of tools for importing packs of scenes, images, playlists prepared by the community.
+[Moulinette](https://github.com/SvenWerlen/moulinette) is a set of tools for importing packs of scenes, images, playlists prepared by the community.
 
-### Moulinette Forge
+* [Moulinette Forge](#forge): import scenes into your world. Share your scenes with the community.
+* [Moulinette Scribe](#scribe): install and apply translations.
+* [Install the module](#install): install the module on your Foundry VTT server.
+* [Install the module](support): install the module on your Foundry VTT server.
+
+## <a name="forge"/>Moulinette Forge
 
 You're a GM (game master) preparing a new scenario? Moulinette Forge lets you browse a catalog of scenes shared by the community. 
 * Search in the catalog
 * Have a look at the preview
-* Check the scenes you like to import
+* Check the scenes you want to import
 * Forge!
 
 ![Catalog](docs/img/moulinette-forge.jpg)
@@ -23,12 +28,42 @@ You are a map designer and have prepared some scenes you'd like to share? Moulin
 
 ![Catalog](docs/img/moulinette-forge3.jpg)
 
-### Install the module
+## <a name="scribe"/>Moulinette Scribe
 
-To install the module, simply install *Moulinette for Foundry VTT* from the offical list of Foundry VTT modules
+Scribe is intended for non-english communities. Moulinette Scribe lets you browse a catalog of available translations maintain by the communities
+* Search in the catalog (use smart filters!)
+* Check the translations you want to install
+* Scribe!
+
+![Translations](docs/img/moulinette-scribe.jpg)
+
+### Benefits
+* Quick and easy search for available translations
+* Doesn't require the installation of additonal modules
+* Supports Core & Babele translations
+* Can be updated without exiting your worlds or restarting the server
+* Translators can provide translations for any module/system without having to create a module or ask the developer to include the translations
+* Translations can be hosted anywhere (GitHub, GitLab, public website, etc.)
+
+
+## <a name="install"/>Install the module
 
 To **manually install** the module, follow these instructions:
 
 1. Start FVTT and browse to the Game Modules tab in the Configuration and Setup menu
 2. Select the Install Module button and enter the following URL: https://raw.githubusercontent.com/svenwerlen/fvtt-moulinette/master/module.json
 3. Click Install and wait for installation to complete 
+
+![Install custom module](docs/img/moulinette-install.jpg)
+
+### Why Moulinette is not available in the official list ?
+
+Unfortunately and although Moulinette makes sure to obtain all authorizations from the authors before referring resources in the catalogs, 
+Foundry VTT considers that this module intents to distribute copyrighted content without license. Therefore, you might not promote
+Moulinette in any forum of Foundry VTT. Spread the word!
+
+## <a name="support"/>Support me on Patreon
+
+If you like my work and want to support me, consider becoming a patreon or throwing a buck or two at me!
+
+[https://www.patreon.com/moulinette](https://www.patreon.com/moulinette)

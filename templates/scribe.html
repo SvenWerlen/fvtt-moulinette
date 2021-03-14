@@ -1,0 +1,55 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+  <p>{{localize "mtte.scribeWelcome"}}</p>
+  {{#if error}}
+  <div class="error">{{error}}</div>
+  {{/if}}
+  {{#unless error}}
+    <div class="main">
+      <p>
+        <h3>{{localize "mtte.translations"}}</h3>
+        <p>
+          <div class="actions"><input type="checkbox" id="filterModSys" name="filterModSys" value="1" {{#if filterModSysEnabled}}checked="checked"{{/if}}>
+            {{localize "mtte.filterModSys"}}
+            <i class="preview fas fa-question-circle" title="{{localize "mtte.filterModSysToolTip"}}"></i>
+          </div>
+          <div class="actions"><input type="checkbox" id="filterLang" name="filterLang" value="1" {{#if filterLangEnabled}}checked="checked"{{/if}}>
+            {{filterLang}}
+            <i class="preview fas fa-question-circle" title="{{localize "mtte.filterLangToolTip"}}"></i>
+          </div>
+          <div class="actions"><input type="checkbox" id="filterCore" name="filterCore" value="1" {{#if filterCore}}checked="checked"{{/if}}>
+            {{localize "mtte.filterCore"}}
+            <i class="preview fas fa-question-circle" title="{{localize "mtte.filterCoreToolTip"}}"></i>
+          </div>
+          <div class="actions"><input type="checkbox" id="filterBabele" name="filterBabele" value="1" {{#if filterBabele}}checked="checked"{{/if}}>
+            {{localize "mtte.filterBabele"}}
+            <i class="preview fas fa-question-circle" title="{{localize "mtte.filterBabeleToolTip"}}"></i>
+          </div>
+        </p>
+        <div class="search"><input id="searchTransl" type="text" placeholder="{{lists.transl.length}} {{localize "mtte.translations"}}. {{localize "mtte.search"}}"></input></div>
+        <div id="translPacks" class="list">
+        {{#each lists.transl as |ts|}}
+          <div for="{{ts.name}}" class="pack" title="{{ts.description}}">
+            <span class="transl">
+              <input type="checkbox" class="check" name="{{ts.id}}" value="{{ts.url}}">
+              {{ts.name}} <small>({{ts.translCount}})</small>
+            </span>
+            <a href="{{ts.source.url}}" target="_blank">{{ts.source.name}}</a>
+          </div>
+        {{/each}}
+        </div>
+      </p>
+      <p>
+        <div class="actions"><input type="reset" value="{{localize "mtte.clear"}}" /></div>
+        <div class="actions"><input type="submit" value="{{localize "mtte.scribeAction"}}" /></div>
+        <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
+      </p>
+    </div>
+    <img class="logo" src="modules/fvtt-moulinette/img/moulinette-icon.png" width="60"/>
+    <p>You want translations to be supported by <a href="https://github.com/SvenWerlen/moulinette">Moulinette</a>? Join me on <a href="https://discord.gg/xg3dcMQfP2" target="_blank">Moulinette Discord</a> to discuss it. 
+    </div>
+  {{/unless}}
+  <p><em>
+    <a href="https://github.com/SvenWerlen/moulinette">{{localize "mtte.seeDoc"}}</a> {{localize "mtte.learnMore"}}
+  </em></p>
+  
+</form>
