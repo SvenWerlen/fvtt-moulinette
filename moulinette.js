@@ -33,9 +33,26 @@ Hooks.once("ready", async function () {
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/transl");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/babele");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/core");
-  }   
+    
+    // open moulinette on CTRL+M
+    document.onkeydown = function (evt) {
+        if(evt.key == "m" && evt.ctrlKey && !evt.altKey && !evt.metaKey) {
+          game.moulinette.Moulinette.showMoulinette()
+        }
+    };
+  }
 });
 
+
+// Render Sidebar
+Hooks.on("renderSidebarTab", (app, html) => {
+  if (app instanceof Settings) {
+    // Add changelog button
+    let button = $(`<button><i class="fas fa-hammer"></i> ${game.i18n.localize("mtte.moulinette")}</button>`);
+    html.find("#game-details").append(button);
+    button.click(() => { game.moulinette.Moulinette.showMoulinette() });
+  }
+});
 
 Hooks.on("getSceneDirectoryEntryContext", (html, options) => {
   options.push({

@@ -210,6 +210,9 @@ class MoulinetteForge extends FormApplication {
     this.msgbox = html.find(".messagebox")
     this.html = html
     
+    // buttons
+    html.find("button").click(this._onClickButton.bind(this))
+    
     // hide error/success message on anychange
     html.find(".check").click(this._hideMessagebox.bind(this));
     
@@ -243,7 +246,27 @@ class MoulinetteForge extends FormApplication {
     this._hideMessagebox()
   }
   
-  async _updateObject(event, inputs) {
+  async _onClickButton(event) {
+    event.preventDefault();
+    const source = event.currentTarget;
+    const window = this
+    if (source.classList.contains("clear")) {
+      this.html.find("#scenePacks .check:checkbox:checked").prop('checked', false);
+    }
+    else if (source.classList.contains("install")) {
+      const names = []
+      this.html.find("#scenePacks .check:checkbox:checked").each(function () {
+        names.push($(this).attr("name"))
+      });
+      const selected = this.lists.scenes.filter( ts => names.includes(ts.id) )
+      if(selected.length == 0) {
+        return this._displayMessage(game.i18n.localize("ERROR.mtteSelectAtLeastOne"), 'error')
+      }
+      this._installPacks(selected)
+    }
+  }
+  
+  async _installPacks(selected) {
     event.preventDefault();
     if(!this.lists || !this.lists.scenes) {
       return;
@@ -251,7 +274,6 @@ class MoulinetteForge extends FormApplication {
     
     ui.scenes.activate() // give focus to scenes
     
-    const selected = this.lists.scenes.filter( sc => sc.id in inputs && inputs[sc.id] )
     if(selected.length == 0) {
       this._displayMessage(game.i18n.localize("ERROR.mtteSelectAtLeastOne"), 'error')
       
