@@ -11,4 +11,4 @@ This page provides information about copyrights and authorisations from the owne
 
 * **pathfinder-fr (pf2)**: I'm the owner of [foundryvtt-pathfinder2-fr](https://gitlab.com/pathfinder-fr/foundryvtt-pathfinder2-fr) repository.
 * **Foundry core**: see [request](https://gitlab.com/baktov.sugar/foundryvtt-lang-fr-fr/-/issues/6).
-* **Pathfinder 2 (système)**: see [request](https://gitlab.com/pathfinder-fr/foundryvtt-pathfinder2e-lang-fr/-/issues/2).
+* **Pathfinder 2 (système)**: see [request](https://gitlab.com/pathfinder-fr/foundryvtt-pathfinder2e-lang-fr/-/issues/2) and [pathfinderfr.jpg](pathfinderfr1.jpg).

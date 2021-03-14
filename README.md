@@ -39,9 +39,9 @@ Scribe is intended for non-english communities. Moulinette Scribe lets you brows
 
 ### Benefits
 * Quick and easy search for available translations
-* Doesn't require the installation of additonal modules
+* Doesn't require the installation of additional modules
 * Supports Core & Babele translations
-* Can be updated without exiting your worlds or restarting the server
+* Can be updated without exiting your worlds nor restarting the server
 * Translators can provide translations for any module/system without having to create a module or ask the developer to include the translations
 * Translations can be hosted anywhere (GitHub, GitLab, public website, etc.)
 
