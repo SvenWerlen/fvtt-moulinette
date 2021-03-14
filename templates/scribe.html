@@ -8,19 +8,19 @@
       <p>
         <h3>{{localize "mtte.translations"}}</h3>
         <p>
-          <div class="actions"><input type="checkbox" id="filterModSys" name="filterModSys" value="1" {{#if filterModSysEnabled}}checked="checked"{{/if}}>
+          <div class="option"><input type="checkbox" id="filterModSys" name="filterModSys" value="1" {{#if filterModSysEnabled}}checked="checked"{{/if}}>
             {{localize "mtte.filterModSys"}}
             <i class="preview fas fa-question-circle" title="{{localize "mtte.filterModSysToolTip"}}"></i>
           </div>
-          <div class="actions"><input type="checkbox" id="filterLang" name="filterLang" value="1" {{#if filterLangEnabled}}checked="checked"{{/if}}>
+          <div class="option"><input type="checkbox" id="filterLang" name="filterLang" value="1" {{#if filterLangEnabled}}checked="checked"{{/if}}>
             {{filterLang}}
             <i class="preview fas fa-question-circle" title="{{localize "mtte.filterLangToolTip"}}"></i>
           </div>
-          <div class="actions"><input type="checkbox" id="filterCore" name="filterCore" value="1" {{#if filterCore}}checked="checked"{{/if}}>
+          <div class="option"><input type="checkbox" id="filterCore" name="filterCore" value="1" {{#if filterCore}}checked="checked"{{/if}}>
             {{localize "mtte.filterCore"}}
             <i class="preview fas fa-question-circle" title="{{localize "mtte.filterCoreToolTip"}}"></i>
           </div>
-          <div class="actions"><input type="checkbox" id="filterBabele" name="filterBabele" value="1" {{#if filterBabele}}checked="checked"{{/if}}>
+          <div class="option"><input type="checkbox" id="filterBabele" name="filterBabele" value="1" {{#if filterBabele}}checked="checked"{{/if}}>
             {{localize "mtte.filterBabele"}}
             <i class="preview fas fa-question-circle" title="{{localize "mtte.filterBabeleToolTip"}}"></i>
           </div>
@@ -39,12 +39,14 @@
         </div>
       </p>
       <p>
-        <div class="actions"><input type="reset" value="{{localize "mtte.clear"}}" /></div>
-        <div class="actions"><input type="submit" value="{{localize "mtte.scribeAction"}}" title="{{localize "mtte.scribeActionToolTip"}}"  /></div>
         <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
       </p>
       <p>
-        <div class="actions"><button class="update" title="{{localize "mtte.updateActionToolTip"}}">{{localize "mtte.updateAction"}}</button></div>
+        <div class="actions">
+          <button class="clear" title="{{localize "mtte.clearActionToolTip"}}"><i class="far fa-square"></i> {{localize "mtte.clearAction"}}</button>
+          <button class="install default" title="{{localize "mtte.scribeActionToolTip"}}"><i class="fas fa-hammer"></i> {{localize "mtte.scribeAction"}}</button>
+          <button class="update" title="{{localize "mtte.updateActionToolTip"}}"><i class="fas fa-sync-alt"></i> {{localize "mtte.updateAction"}}</button>
+        </div>
       </p>
     </div>
     <img class="logo" src="modules/fvtt-moulinette/img/moulinette-icon.png" width="60"/>

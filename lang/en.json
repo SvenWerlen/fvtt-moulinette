@@ -53,7 +53,8 @@
     "mtte.filterCoreToolTip": "Include translations for core/systems",
     
     "mtte.currentlyAvailable": "currently available for Moulinette",
-    "mtte.clear": "Clear",
+    "mtte.clearAction": "Unselect all",
+    "mtte.clearActionToolTip": "Unselects all checkboxes",
     "mtte.packs": "Packs",
     "mtte.scenes": "Scenes",
     "mtte.see": "See",
@@ -64,7 +65,7 @@
     "mtte.downloadFailure": "Something went bad. Report it to Moulinette Discord",
     "mtte.downloadCoreSuccess": "Translations successfully installed! You'll need to refresh your page!",
     
-    "mtte.updateAction": "Update installed translations",
+    "mtte.updateAction": "Update installed",
     "mtte.updateActionToolTip": "Checks if there is any update for translations that you installed with Moulinette",
     "mtte.updateContent": "Moulinette will update the following {count} translation(s):<br/>",
     "mtte.installingPacks": "Installing...",

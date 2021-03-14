@@ -589,7 +589,7 @@ class MoulinetteScribe extends FormApplication {
     html.find("#filterBabele").click(this._toggleBabele.bind(this))
     
     // buttons
-    html.find("button").click(this._checkUpdates.bind(this))
+    html.find("button").click(this._onClickButton.bind(this))
     
     // enable alt _alternateColors
     this._alternateColors()
@@ -632,11 +632,25 @@ class MoulinetteScribe extends FormApplication {
     }
   }
   
-  async _checkUpdates(event) {
+  async _onClickButton(event) {
     event.preventDefault();
     const source = event.currentTarget;
     const window = this
-    if (source.classList.contains("update")) {      
+    if (source.classList.contains("install")) {
+      const names = []
+      this.html.find("#translPacks .check:checkbox:checked").each(function () {
+        names.push($(this).attr("name"))
+      });
+      const selected = this.lists.transl.filter( ts => names.includes(ts.id) )
+      if(selected.length == 0) {
+        return this._displayMessage(game.i18n.localize("ERROR.mtteSelectAtLeastOne"), 'error')
+      }
+      this._installPacks(selected)
+    }
+    else if (source.classList.contains("clear")) {
+      this.html.find("#translPacks .check:checkbox:checked").prop('checked', false);
+    }
+    else if (source.classList.contains("update")) {
       let packInstalled = JSON.parse(game.settings.get("moulinette", "packInstalled"))
       const selected = this.lists.transl.filter( ts => packInstalled.includes(ts.filename) )
       let namesList = ""
@@ -650,12 +664,6 @@ class MoulinetteScribe extends FormApplication {
         no: () => {}
       });
     }
-  }
- 
-  async _updateObject(event, inputs) {
-    event.preventDefault();
-    const selected = this.lists.transl.filter( ts => ts.id in inputs && inputs[ts.id] )
-    this._installPacks(selected)
   }
   
   /**
