@@ -18,8 +18,9 @@
     
     "mtte.forgingItem": "Forging {pack} ... please wait!",
     "mtte.forgingItemMultiple": "Forging {pack} ({scene}) ... please wait!",
-    "mtte.forgingSuccess": "Items were successfully forged!",
+    "mtte.forgingSuccess": "Scenes were successfully forged!",
     "mtte.forgingFailure": "Something went bad. Report it to Moulinette Discord",
+    "mtte.forgingGameIconsSuccess": "Images were successfully forged! Path to folder was copied into your clipboard.",
     
     "mtte.share": "Share the scene with Moulinette",
     "mtte.shareWelcome": "You are about to share a scene with the Moulinette community. After the review process, the scene will be made available to everyone.",
@@ -56,6 +57,8 @@
     "mtte.currentlyAvailable": "currently available for Moulinette",
     "mtte.clearAction": "Unselect all",
     "mtte.clearActionToolTip": "Unselects all checkboxes",
+    "mtte.selectAllAction": "Select all",
+    "mtte.selectAllActionToolTip": "Selects all checkboxes",
     "mtte.packs": "Packs",
     "mtte.scenes": "Scenes",
     "mtte.see": "See",
@@ -82,6 +85,10 @@
     "mtte.lang.pt-BR": "Portuguese (Brasil)",
     "mtte.lang.sv": "Swedish",
     
+    "mtte.gameIcons": "Game-icons.net",
+    "mtte.backgroundColor": "Background color",
+    "mtte.foregroundColor": "Foreground color",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
@@ -97,6 +104,7 @@
     "ERROR.mtteAuthorImg": "Please provide the author of the image ",
     "ERROR.mtteAuthorURL": "Please provide the URL for the author of the image",
     "ERROR.mtteUnexpected": "Unexpected error from server. Check the logs!",
+    "ERROR.mtteInvalidColor": "Invalid color format. Use #dddddd.",
     
     "ERROR.mtteNoBabele": "You installed a translation for Babele BUT you don't have Babele installed or the module is NOT active",
     

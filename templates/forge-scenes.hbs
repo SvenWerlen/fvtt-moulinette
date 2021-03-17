@@ -1,0 +1,30 @@
+<div class="main">
+  <p>
+    <div class="description">{{localize "mtte.scenes"}} {{localize "mtte.currentlyAvailable"}}. {{localize "mtte.see"}} <a href="https://github.com/SvenWerlen/moulinette-data/tree/main/scenes" target="_blank">{{localize "mtte.scenes"}}</a>.</div>
+    <div class="search"><input id="searchScenes" type="text" placeholder="{{lists.scenes.length}} {{localize "mtte.packs"}} ({{scCount}} {{localize "mtte.scenes"}}). {{localize "mtte.search"}}"></input></div>
+    <div id="scenePacks" class="list">
+    {{#each lists.scenes as |sc|}}
+      <div for="{{sc.name}}" class="pack" title="{{sc.description}}">
+        <span class="scene">
+          <input type="checkbox" class="check" name="{{sc.id}}" value="{{sc.url}}">
+          {{sc.name}} <small>({{sc.scenesCount}})</small>
+          <i class="preview fas fa-eye"  data-id="{{sc.filename}}" title="{{localize "mtte.preview"}}"></i>
+        </span>
+        <a href="{{sc.source.url}}" target="_blank">{{sc.source.name}}</a>
+      </div>
+    {{/each}}
+    </div>
+  </p>
+  <p>
+    <div class="actions">
+      <button class="clear" title="{{localize "mtte.clearActionToolTip"}}"><i class="far fa-square"></i> {{localize "mtte.clearAction"}}</button>
+      <button class="install default" title="{{localize "mtte.forgeToolTip"}}"><i class="fas fa-hammer"></i> {{localize "mtte.forge"}}</button>
+    </div>
+  </p>
+  <p>
+    <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
+  </p>
+</div>
+<img class="logo" src="modules/fvtt-moulinette/img/moulinette-icon.png" width="60"/>
+<p>This is still a prototype. Interface is minimalistic and server resources are kept small until <a href="https://www.patreon.com/moulinette" target="_blank">Patron support</a> will be enough to afford more. Join me on <a href="https://discord.gg/xg3dcMQfP2" target="_blank">Moulinette Discord</a> to follow development and support it. 
+</p>

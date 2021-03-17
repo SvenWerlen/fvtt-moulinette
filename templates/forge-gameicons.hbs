@@ -1,0 +1,25 @@
+<div class="main">
+  <p>
+    <div class="description">{{localize "mtte.gameIcons"}} {{localize "mtte.currentlyAvailable"}}. {{localize "mtte.see"}} <a href="https://game-icons.net" target="_blank">game-icons.net</a>.</div>
+    <div class="search"><input id="searchGameIcons" type="text" placeholder="{{gameIconsCount}} {{localize "mtte.gameIcons"}}. {{localize "mtte.search"}}"></input></div>
+    <div id="gameIcons" class="list">
+    </div>
+  </p>
+  <div class="options">
+    {{localize "mtte.foregroundColor"}} <input class="color" type="text" name="fgColor" maxlength="7" value="{{fgColor}}"> <input type="color" value="{{fgColor}}" data-edit="fgColor">
+    {{localize "mtte.backgroundColor"}} <input class="color" type="text" name="bgColor" maxlength="7" value="{{bgColor}}"> <input type="color" value="{{bgColor}}" data-edit="bgColor"> 
+  </div>  
+  <p>
+    <div class="actions">
+      <button class="clear" title="{{localize "mtte.clearActionToolTip"}}"><i class="far fa-square"></i> {{localize "mtte.clearAction"}}</button>
+      <button class="selectAll" title="{{localize "mtte.selectAllActionToolTip"}}"><i class="far fa-check-square"></i> {{localize "mtte.selectAllAction"}}</button>
+      <button class="install default" title="{{localize "mtte.forgeToolTip"}}"><i class="fas fa-hammer"></i> {{localize "mtte.forge"}}</button>
+    </div>
+  </p>
+  <p>
+    <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
+  </p>
+</div>
+<img class="logo" src="modules/fvtt-moulinette/img/moulinette-icon.png" width="60"/>
+<p>This is still a prototype. Interface is minimalistic and server resources are kept small until <a href="https://www.patreon.com/moulinette" target="_blank">Patron support</a> will be enough to afford more. Join me on <a href="https://discord.gg/xg3dcMQfP2" target="_blank">Moulinette Discord</a> to follow development and support it. 
+</p>

@@ -1,0 +1,25 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+  <p>{{localize "mtte.forgeWelcome"}}</p>
+  {{#if error}}
+  <div class="error">{{error}}</div>
+  {{/if}}
+  {{#unless error}}
+  
+    <nav class="sheet-tabs tabs">
+      <a class="item {{#if scenesActive}}active{{/if}}" data-tab="scenes"><i class="fas fa-images"></i> {{localize "mtte.scenes"}}</a>
+      <a class="item {{#if gameIconActive}}active{{/if}}" data-tab="gameicons"><i class="fas fa-file-image"></i> {{localize "mtte.gameIcons"}}</a>
+    </nav>
+
+    {{#if scenesActive}}
+      {{> "modules/fvtt-moulinette/templates/forge-scenes.hbs"}}
+    {{/if}}
+    {{#if gameIconsActive}}
+      {{> "modules/fvtt-moulinette/templates/forge-gameicons.hbs"}}
+    {{/if}}
+  
+  {{/unless}}
+  <p><em>
+    <a href="https://github.com/SvenWerlen/moulinette">{{localize "mtte.seeDoc"}}</a> {{localize "mtte.learnMore"}}
+  </em></p>
+  
+</form>

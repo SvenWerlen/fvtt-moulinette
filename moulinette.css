@@ -69,6 +69,21 @@
 .mtte .scene, .mtte .transl { 
   width: 400px;
 }
+
+.mtte .gameicon {
+  width: 300px;
+  padding-left: 5px;
+}
+
+.mtte .color {
+  margin-left: 7px;
+  width: 70px;
+}
+
+.mtte .pack img {
+  width: 32px;
+  margin: 2px 0px;
+}
   
 .mtte .thumb { 
   overflow: hidden;
@@ -111,4 +126,10 @@
   line-height: 16px;
   font-size: smaller;
   text-align: justify;
+}
+
+.mtte .tabs {
+  border-bottom: 1px solid #000;
+  margin-bottom: 15px;
+  font-size: large;
 }

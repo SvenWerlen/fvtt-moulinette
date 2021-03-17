@@ -9,10 +9,23 @@ Hooks.once("init", async function () {
   game.settings.register("moulinette", "shareDiscordId", { scope: "world", config: false, type: String });
   game.settings.register("moulinette", "packInstalled", { scope: "world", config: false, type: String, default: "[]" })
   game.settings.register("moulinette", "coreLanguages", { scope: "world", config: false, type: String, default: "[]" })
+  game.settings.register("moulinette", "gIconFgColor", { scope: "world", config: false, type: String, default: "#ffffff" })
+  game.settings.register("moulinette", "gIconBgColor", { scope: "world", config: false, type: String, default: "#000000" })
   
   game.moulinette = {
     Moulinette
   }
+  
+  // Define template paths to load
+  const templatePaths = [
+    // Forge Partials
+    "modules/fvtt-moulinette/templates/forge-scenes.hbs",
+    "modules/fvtt-moulinette/templates/forge-gameicons.hbs",
+  ];
+
+  // Load the template parts
+  loadTemplates(templatePaths);
+
   
   // dynamically add languages
   const coreLang = game.settings.get("moulinette", "coreLanguages")
@@ -31,6 +44,7 @@ Hooks.once("ready", async function () {
     await Moulinette.createFolderIfMissing(".", "moulinette");
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/scenes");
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/transl");
+    await Moulinette.createFolderIfMissing("moulinette", "moulinette/images");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/babele");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/core");
     

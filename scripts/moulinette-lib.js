@@ -118,7 +118,7 @@ class MoulinetteHome extends FormApplication {
       id: "moulinette",
       classes: ["mtte", "home"],
       title: game.i18n.localize("mtte.moulinetteHome"),
-      template: "modules/fvtt-moulinette/templates/home.html",
+      template: "modules/fvtt-moulinette/templates/home.hbs",
       width: "400",
       height: "350",
       closeOnSubmit: false,
@@ -154,12 +154,17 @@ class MoulinetteHome extends FormApplication {
  *************************/
 class MoulinetteForge extends FormApplication {
   
+  constructor(tab = "scenes") {
+    super()
+    this.tab = tab;
+  }
+  
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       id: "moulinette",
       classes: ["mtte", "forge"],
       title: game.i18n.localize("mtte.moulinetteForge"),
-      template: "modules/fvtt-moulinette/templates/forge.html",
+      template: "modules/fvtt-moulinette/templates/forge.hbs",
       width: 600,
       height: "auto",
       closeOnSubmit: false,
@@ -181,7 +186,10 @@ class MoulinetteForge extends FormApplication {
         sc.source = { name: sc.source.split('|')[0], url: sc.source.split('|')[1] } 
         scCount += sc.scenesCount
       })
-      return { lists: this.lists, scCount: scCount }
+      return { 
+        lists: this.lists, scCount: scCount, scenesActive: this.tab == "scenes", gameIconsActive: this.tab == "gameicons" ,
+        fgColor: game.settings.get("moulinette", "gIconFgColor"), bgColor: game.settings.get("moulinette", "gIconBgColor")
+      }
     } else {
       console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
       return { error: game.i18n.localize("ERROR.mtteServerCommunication") }
@@ -198,10 +206,16 @@ class MoulinetteForge extends FormApplication {
       $('#scenePacks *').filter('.pack').each(function() {
         const text = $(this).text().trim().toLowerCase() + $(this).attr("title");
         $(this).css('display', text.length == 0 || text.indexOf(filter) >= 0 ? 'flex' : 'none')
-      });
+      })
       window._alternateColors();
       window._hideMessagebox();
-    });
+    }).focus();
+    
+    html.find("#searchGameIcons").on("keyup", this._onSearch.bind(this)).focus();
+    
+    // click on tabs
+    html.find(".tabs a").click(this._onNavigate.bind(this));
+    
     
     // click on preview
     html.find(".preview").click(this._onPreview.bind(this));
@@ -217,6 +231,46 @@ class MoulinetteForge extends FormApplication {
     html.find(".check").click(this._hideMessagebox.bind(this));
     
     // enable alt _alternateColors
+    this._alternateColors()
+  }
+  
+  _onSearch(event) {
+    event.preventDefault();
+    const source = event.currentTarget;
+    this.filter = $(source).val()
+    clearTimeout(this.timeout)
+    this.timeout = setTimeout(this._search.bind(this), 500)
+  }
+  
+  async _search() {
+    console.log("Moulinette | Searching ... " + this.filter)
+    if(this.filter.length < 2) return this.html.find("#gameIcons").html("")
+    const query = encodeURI(this.filter)
+    const request = { requests: [{
+      indexName: "icons",
+      hitsPerPage: 50,
+      params: `query=${query}&page=0`
+    }]}
+    
+    // execute search
+    const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+    const params = "x-algolia-application-id=9HQ1YXUKVC&x-algolia-api-key=fa437c6f1fcba0f93608721397cd515d"
+    const response = await fetch("https://9hq1yxukvc-3.algolianet.com/1/indexes/*/queries?" + params, { method: "POST", headers: headers, body: JSON.stringify(request)}).catch(function(e) {
+      console.log(`Moulinette | Cannot establish connection to server algolianet`, e)
+    });
+    
+    const res = await response.json()
+    let html = ""
+    res.results[0].hits.forEach( r => {
+      const author = r.id.split('/')[1]
+      html += `<div class="pack" title="${r._highlightResult.content.value}">
+        <input type="checkbox" class="check" name="${r.id}" value="${r.id}">
+        <img src="https://game-icons.net/icons/ffffff/000000/${r.id}.svg"/>
+        <span class="gameicon">${r.name}</span>
+        <a href="https://game-icons.net/about.html#authors" target="_blank">${author}@game-icons.net</a>
+      </div>` })
+    
+    this.html.find("#gameIcons").html(html)
     this._alternateColors()
   }
   
@@ -237,6 +291,16 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
+  _onNavigate(event) {
+    event.preventDefault();
+    const source = event.currentTarget;
+    const tab = source.dataset.tab;
+    if(["scenes", "gameicons"].includes(tab)) {
+      this.tab = tab;
+      this.render();
+    }
+  }
+  
   _onPreview(event) {
     event.preventDefault();
     const source = event.currentTarget;
@@ -250,23 +314,77 @@ class MoulinetteForge extends FormApplication {
     event.preventDefault();
     const source = event.currentTarget;
     const window = this
-    if (source.classList.contains("clear")) {
-      this.html.find("#scenePacks .check:checkbox:checked").prop('checked', false);
+
+    if (source.classList.contains("clear") || source.classList.contains("selectAll")) {
+      this.html.find(".list .check:checkbox").prop('checked', source.classList.contains("selectAll"));
     }
-    else if (source.classList.contains("install")) {
+    else if (this.tab == "scenes" && source.classList.contains("install")) {
       const names = []
       this.html.find("#scenePacks .check:checkbox:checked").each(function () {
         names.push($(this).attr("name"))
       });
+      
       const selected = this.lists.scenes.filter( ts => names.includes(ts.id) )
       if(selected.length == 0) {
         return this._displayMessage(game.i18n.localize("ERROR.mtteSelectAtLeastOne"), 'error')
       }
-      this._installPacks(selected)
+      this._installScenes(selected)
+    }
+    else if(this.tab == "gameicons" && source.classList.contains("install")) {
+      const selected = []
+      this.html.find("#gameIcons .check:checkbox:checked").each(function () {
+        selected.push($(this).attr("name"))
+      });
+      if(selected.length == 0) {
+        return this._displayMessage(game.i18n.localize("ERROR.mtteSelectAtLeastOne"), 'error')
+      }
+      
+      // retrieve color
+      const fgColor = this.html.find("input[name='fgColor']").val()
+      const bgColor = this.html.find("input[name='bgColor']").val()
+      let re = /#[\da-f]{6}/;
+      if(!re.test(fgColor) || !re.test(bgColor)) {
+        return this._displayMessage(game.i18n.localize("ERROR.mtteInvalidColor"), 'error')
+      }
+      
+      // store colors as preferences
+      game.settings.set("moulinette", "gIconFgColor", fgColor)
+      game.settings.set("moulinette", "gIconBgColor", bgColor)
+      
+      SceneNavigation._onLoadProgress(game.i18n.localize("mtte.installingPacks"),0);  
+      let idx = 0;
+      for(const svg of selected) {
+        idx++;
+        const headers = { method: "POST", headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'}, body: JSON.stringify({ url: svg }) }
+        const response = await fetch(MoulinetteClient.SERVER_URL + "/bundler/fvtt/gameicon", headers).catch(function(e) {
+          console.log(`Moulinette | Cannot download image ${svg}`, e)
+        });
+
+        let text = await response.text()
+        let imageName = svg.split('/').pop() + ".svg"
+        
+        if(fgColor != "#ffffff" || bgColor != "#000000") {
+          console.log(fgColor, bgColor)
+          text = text.replace(`fill="#fff"`, `fill="${bgColor}"`).replace(`<path d=`, `<path fill="${fgColor}" d=`)
+          imageName = svg.split('/').pop() + `-${fgColor}-${bgColor}.svg`
+        }
+        
+        //const blob = await response.blob()
+        await Moulinette.upload(new File([text], imageName, { type: "image/svg+xml", lastModified: new Date() }), imageName, "moulinette/images", `moulinette/images/gameicons`, true)
+        SceneNavigation._onLoadProgress(game.i18n.localize("mtte.installingPacks"), Math.round((idx / selected.length)*100));
+      }
+      SceneNavigation._onLoadProgress(game.i18n.localize("mtte.installingPacks"),100);  
+      this._displayMessage(game.i18n.localize("mtte.forgingGameIconsSuccess"), 'success')
+      
+      // copy path into clipboard
+      navigator.clipboard.writeText("moulinette/images/gameicons")
+      .catch(err => {
+        console.warn("Moulinette | Not able to copy path into clipboard")
+      });
     }
   }
   
-  async _installPacks(selected) {
+  async _installScenes(selected) {
     event.preventDefault();
     if(!this.lists || !this.lists.scenes) {
       return;
@@ -382,7 +500,7 @@ class MoulinettePreviewer extends FormApplication {
       id: "moulinette-preview",
       classes: ["mtte", "preview"],
       title: game.i18n.localize("mtte.preview"),
-      template: "modules/fvtt-moulinette/templates/preview.html",
+      template: "modules/fvtt-moulinette/templates/preview.hbs",
       width: 420,
       height: 470,
       closeOnSubmit: false,
@@ -418,7 +536,7 @@ class MoulinetteShare extends FormApplication {
       id: "moulinette-share",
       classes: ["mtte", "share"],
       title: game.i18n.localize("mtte.share"),
-      template: "modules/fvtt-moulinette/templates/share.html",
+      template: "modules/fvtt-moulinette/templates/share.hbs",
       width: 500,
       height: 500,
       closeOnSubmit: false,
@@ -429,7 +547,6 @@ class MoulinetteShare extends FormApplication {
   async getData() {
     const authorImg = game.settings.get("moulinette", "shareImgAuthor")
     const discordId = game.settings.get("moulinette", "shareDiscordId") 
-    console.log(authorImg, discordId)
     return { sceneName: this.scene.name, authorImg: authorImg != "undefined" ? authorImg : "", discordId: discordId != "undefined" ? discordId : "" };
   }
 
@@ -528,7 +645,7 @@ class MoulinetteScribe extends FormApplication {
       id: "moulinette",
       classes: ["mtte", "scribe"],
       title: game.i18n.localize("mtte.moulinetteScribe"),
-      template: "modules/fvtt-moulinette/templates/scribe.html",
+      template: "modules/fvtt-moulinette/templates/scribe.hbs",
       width: 600,
       height: "auto",
       closeOnSubmit: false,
