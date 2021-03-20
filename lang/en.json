@@ -12,6 +12,7 @@
     "mtte.forge": "Forge!",
     
     "mtte.forgeWelcome": "Instructions : check all resources you want Moulinette to forge.",
+    "mtte.forgeWelcomeSearch": "Instructions : search then click for action.",
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
     "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
@@ -62,12 +63,20 @@
     "mtte.packs": "Packs",
     "mtte.scenes": "Scenes",
     "mtte.see": "See",
-    "mtte.search": "Type something to filter list",
+    "mtte.search": "Type something to search... then ENTER (or click button)",
     "mtte.scribeAction": "Scribe!",
     "mtte.scribeActionToolTip": "Install all checked translations, configure Babele, and reloads page",
     "mtte.downloadSuccess": "Translations successfully installed! Reloading...",
     "mtte.downloadFailure": "Something went bad. Report it to Moulinette Discord",
     "mtte.downloadCoreSuccess": "Translations successfully installed! You'll need to refresh your page!",
+    "mtte.downloadImage": "Download",
+    "mtte.downloadImageToolTip": "Download image into Foundry VTT",
+    "mtte.searchBy": "Search provided by Microsoft Bing",
+    "mtte.imageFrom": "Image from",
+    "mtte.imageSize": "Image size",
+    "mtte.createArticle": "Create article",
+    "mtte.createArticleToolTip": "Generates an article based on the image",
+    "mtte.searchresult": "Search result",
     
     "mtte.updateAction": "Update installed",
     "mtte.updateActionToolTip": "Checks if there is any update for translations that you installed with Moulinette",
@@ -89,6 +98,9 @@
     "mtte.backgroundColor": "Background color",
     "mtte.foregroundColor": "Foreground color",
     
+    "mtte.imageSearch": "Images",
+    "mtte.bingSearch": "Search provided by Microsoft Bing engine",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
@@ -107,6 +119,7 @@
     "ERROR.mtteInvalidColor": "Invalid color format. Use #dddddd.",
     
     "ERROR.mtteNoBabele": "You installed a translation for Babele BUT you don't have Babele installed or the module is NOT active",
+    "ERROR.mtteDownloadTimeout": "Website hosting the image didn't respond. Try again later!",
     
     "mtte.END": ""
 }

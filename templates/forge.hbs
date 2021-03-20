@@ -1,13 +1,20 @@
 <form autocomplete="off" onsubmit="event.preventDefault();">
+  {{#unless imageSearchActive}}
   <p>{{localize "mtte.forgeWelcome"}}</p>
+  {{/unless}}
+  {{#if imageSearchActive}}
+  <p>{{localize "mtte.forgeWelcomeSearch"}}</p>
+  {{/if}}
+  
   {{#if error}}
   <div class="error">{{error}}</div>
   {{/if}}
   {{#unless error}}
   
     <nav class="sheet-tabs tabs">
-      <a class="item {{#if scenesActive}}active{{/if}}" data-tab="scenes"><i class="fas fa-images"></i> {{localize "mtte.scenes"}}</a>
+      <a class="item {{#if scenesActive}}active{{/if}}" data-tab="scenes"><i class="fas fa-image"></i> {{localize "mtte.scenes"}}</a>
       <a class="item {{#if gameIconActive}}active{{/if}}" data-tab="gameicons"><i class="fas fa-file-image"></i> {{localize "mtte.gameIcons"}}</a>
+      <a class="item {{#if imageSearchActive}}active{{/if}}" data-tab="imagesearch"><i class="fas fa-images"></i> {{localize "mtte.imageSearch"}}</a>
     </nav>
 
     {{#if scenesActive}}
@@ -15,6 +22,9 @@
     {{/if}}
     {{#if gameIconsActive}}
       {{> "modules/fvtt-moulinette/templates/forge-gameicons.hbs"}}
+    {{/if}}
+    {{#if imageSearchActive}}
+      {{> "modules/fvtt-moulinette/templates/forge-imagesearch.hbs"}}
     {{/if}}
   
   {{/unless}}

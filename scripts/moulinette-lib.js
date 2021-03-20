@@ -42,8 +42,6 @@ class MoulinetteClient {
     return { 'status': response.status, 'data': await response.json() }
   }
   
-  
-  
   async get(URI) { return this.send(URI, "GET") }
   async put(URI) { return this.send(URI, "PUT") }
   async post(URI, data) { return this.send(URI, "POST", data) }
@@ -115,7 +113,7 @@ class MoulinetteHome extends FormApplication {
   
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
-      id: "moulinette",
+      id: "moulinetteHome",
       classes: ["mtte", "home"],
       title: game.i18n.localize("mtte.moulinetteHome"),
       template: "modules/fvtt-moulinette/templates/home.hbs",
@@ -154,9 +152,12 @@ class MoulinetteHome extends FormApplication {
  *************************/
 class MoulinetteForge extends FormApplication {
   
+  static get TABS() { return ["scenes", "gameicons", "imagesearch"] }
+  
   constructor(tab = "scenes") {
     super()
-    this.tab = tab;
+    const curTab = game.settings.get("moulinette", "currentTab")
+    this.tab = MoulinetteForge.TABS.includes(curTab) ? curTab : "scenes"
   }
   
   static get defaultOptions() {
@@ -167,6 +168,7 @@ class MoulinetteForge extends FormApplication {
       template: "modules/fvtt-moulinette/templates/forge.hbs",
       width: 600,
       height: "auto",
+      resizable: true,
       closeOnSubmit: false,
       submitOnClose: false,
     });
@@ -187,7 +189,7 @@ class MoulinetteForge extends FormApplication {
         scCount += sc.scenesCount
       })
       return { 
-        lists: this.lists, scCount: scCount, scenesActive: this.tab == "scenes", gameIconsActive: this.tab == "gameicons" ,
+        lists: this.lists, scCount: scCount, scenesActive: this.tab == "scenes", gameIconsActive: this.tab == "gameicons" , imageSearchActive: this.tab == "imagesearch",
         fgColor: game.settings.get("moulinette", "gIconFgColor"), bgColor: game.settings.get("moulinette", "gIconBgColor")
       }
     } else {
@@ -212,10 +214,10 @@ class MoulinetteForge extends FormApplication {
     }).focus();
     
     html.find("#searchGameIcons").on("keyup", this._onSearch.bind(this)).focus();
+    html.find("#searchImages").on("keyup", this._onSearch.bind(this)).focus();
     
     // click on tabs
     html.find(".tabs a").click(this._onNavigate.bind(this));
-    
     
     // click on preview
     html.find(".preview").click(this._onPreview.bind(this));
@@ -237,12 +239,22 @@ class MoulinetteForge extends FormApplication {
   _onSearch(event) {
     event.preventDefault();
     const source = event.currentTarget;
-    this.filter = $(source).val()
-    clearTimeout(this.timeout)
-    this.timeout = setTimeout(this._search.bind(this), 500)
+    var charCode = (typeof event.which === "number") ? event.which : event.keyCode;
+    if(charCode != 13) return; // only react to ENTER
+    
+    const newSearch = $(source).val()
+    if(newSearch == this.filter) return;
+    this.filter = newSearch
+    
+    if(this.tab == "gameicons") {
+      //this.timeout = setTimeout(this._searchGameIcons.bind(this), 500)
+      this._searchGameIcons()
+    } else {
+      this._searchImages()
+    }
   }
   
-  async _search() {
+  async _searchGameIcons() {
     console.log("Moulinette | Searching ... " + this.filter)
     if(this.filter.length < 2) return this.html.find("#gameIcons").html("")
     const query = encodeURI(this.filter)
@@ -274,6 +286,36 @@ class MoulinetteForge extends FormApplication {
     this._alternateColors()
   }
   
+  async _searchImages() {
+    console.log("Moulinette | Searching ... " + this.filter)
+    if(this.filter.length < 2) return this.html.find("#images").html("")
+    
+    // execute search
+    let client = new MoulinetteClient()
+    let result = await client.post("/search", { query: this.filter })
+    if( result && result.status == 200 ) {
+      let html = ""
+      this.searchResults = result.data.results;
+      let idx = 0;
+      result.data.results.forEach( r => {
+        idx++
+        html += `<div class="thumbres" title="${r.name}" data-idx="${idx}"><img width="100" height="100" src="${r.thumb}"/></div>` })
+      this.html.find("#images").html(html)
+      this.html.find(".thumbres").click(this._onClickAction.bind(this))
+      this._alternateColors()
+    }
+  }
+  
+  _onClickAction(event) {
+    event.preventDefault();
+    const source = event.currentTarget;
+    const idx = source.dataset.idx;
+    if(this.searchResults && idx > 0 && idx <= this.searchResults.length) {
+      new MoulinetteSearchResult(this.searchResults[idx-1]).render(true)
+    }
+  }
+  
+  
   _alternateColors() {
     $('#scenePacks .pack').removeClass("alt");
     $('#scenePacks .pack:even').addClass("alt");
@@ -295,8 +337,9 @@ class MoulinetteForge extends FormApplication {
     event.preventDefault();
     const source = event.currentTarget;
     const tab = source.dataset.tab;
-    if(["scenes", "gameicons"].includes(tab)) {
+    if(MoulinetteForge.TABS.includes(tab)) {
       this.tab = tab;
+      game.settings.set("moulinette", "currentTab", tab)
       this.render();
     }
   }
@@ -315,7 +358,17 @@ class MoulinetteForge extends FormApplication {
     const source = event.currentTarget;
     const window = this
 
-    if (source.classList.contains("clear") || source.classList.contains("selectAll")) {
+    if (source.classList.contains("search")) {
+      const newSearch = this.html.find(".searchinput").val()
+      if(newSearch == this.filter) return;
+      this.filter = newSearch
+      if(this.tab == "gameicons") {
+        this._searchGameIcons()
+      } else {
+        this._searchImages()
+      }
+    }
+    else if (source.classList.contains("clear") || source.classList.contains("selectAll")) {
       this.html.find(".list .check:checkbox").prop('checked', source.classList.contains("selectAll"));
     }
     else if (this.tab == "scenes" && source.classList.contains("install")) {
@@ -518,7 +571,6 @@ class MoulinettePreviewer extends FormApplication {
     const window = this;
     html.click(function() { window.close() });
   }
-  
 }
 
 /*************************
@@ -613,7 +665,6 @@ class MoulinetteShare extends FormApplication {
       imageURL: inputs.imageURL,
       discordId: inputs.discordId
     })
-    console.log(result)
     if(result.status != 200) {
       console.log("Moulinette | Sharing failed with error: " + result.data.error)
       return ui.notifications.error(game.i18n.format("ERROR.mtteUnexpected"));
@@ -937,3 +988,66 @@ class MoulinetteScribe extends FormApplication {
 }
 
 
+/*************************
+ * Search result
+ *************************/
+class MoulinetteSearchResult extends FormApplication {
+  
+  constructor(data) {
+    super()
+    this.data = data;    
+  }
+  
+  static get defaultOptions() {
+    return mergeObject(super.defaultOptions, {
+      id: "moulinette-searchresult",
+      classes: ["mtte", "searchresult"],
+      title: game.i18n.localize("mtte.searchresult"),
+      template: "modules/fvtt-moulinette/templates/searchresult.hbs",
+      width: 420,
+      height: "auto",
+      closeOnSubmit: true,
+      submitOnClose: false,
+    });
+  }
+  
+  getData() {
+    let domain = (new URL(this.data.page));
+    this.data["domain"] = domain.hostname
+    return this.data
+  }
+  
+  async _updateObject(event) {
+    event.preventDefault();
+
+    // download & upload image
+    const headers = { method: "POST", headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({ url: this.data.url }) }
+    const res = await fetch(MoulinetteClient.SERVER_URL + "/search/download", headers).catch(function(e) {
+      ui.notifications.error(game.i18n.format("ERROR.mtteDownloadTimeout"));
+      console.log(`Moulinette | Cannot download image ${svg}`, e)
+      return;
+    });
+
+    let imageName = this.data.url.split('/').pop()
+    if(imageName.includes(".")) {
+      imageName = imageName.substr(0, imageName.lastIndexOf('.'));
+    }
+    imageName = imageName.replace(/[\W_]+/g,"-") + "." + this.data.format
+    
+    const blob = await res.blob()
+    await Moulinette.upload(new File([blob], imageName, { type: blob.type, lastModified: new Date() }), imageName, "moulinette/images", `moulinette/images/search`, false)
+    const filepath = "moulinette/images/search/" + imageName
+
+    // create article if requested
+    if(event.submitter.className == "createArticle") {
+      ui.journal.activate() // give focus to journal
+      await JournalEntry.create( {name: this.data.name, img: filepath} )
+    }
+  }
+
+  activateListeners(html) {
+    super.activateListeners(html);
+    html.find(".thumb").css('background', `url(${this.data.thumb}) 50% 50% no-repeat`)
+  }
+  
+}

@@ -11,6 +11,7 @@ Hooks.once("init", async function () {
   game.settings.register("moulinette", "coreLanguages", { scope: "world", config: false, type: String, default: "[]" })
   game.settings.register("moulinette", "gIconFgColor", { scope: "world", config: false, type: String, default: "#ffffff" })
   game.settings.register("moulinette", "gIconBgColor", { scope: "world", config: false, type: String, default: "#000000" })
+  game.settings.register("moulinette", "currentTab", { scope: "world", config: false, type: String, default: "scenes" })
   
   game.moulinette = {
     Moulinette
@@ -21,6 +22,7 @@ Hooks.once("init", async function () {
     // Forge Partials
     "modules/fvtt-moulinette/templates/forge-scenes.hbs",
     "modules/fvtt-moulinette/templates/forge-gameicons.hbs",
+    "modules/fvtt-moulinette/templates/forge-imagesearch.hbs",
   ];
 
   // Load the template parts

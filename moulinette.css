@@ -24,7 +24,7 @@
 }
 
 .mtte .list {
-  height: 300px;
+  height: 600px;
   overflow-y: scroll;
   margin-top: 5px;
 }
@@ -84,6 +84,21 @@
   width: 32px;
   margin: 2px 0px;
 }
+
+.mtte.forge .thumbres {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.mtte.forge .thumbres:hover {
+  opacity: 50%;
+}
+
+.mtte .thumbres img {
+  object-fit: contain;
+  border: none;
+  margin: 2px;
+}
   
 .mtte .thumb { 
   overflow: hidden;
@@ -132,4 +147,13 @@
   border-bottom: 1px solid #000;
   margin-bottom: 15px;
   font-size: large;
+}
+
+.mtte button.search {
+  width: 30px;
+  margin-left: 5px;
+}
+
+.mtte .searchinput {
+  width: 540px;
 }

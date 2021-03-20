@@ -1,0 +1,19 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+  <h3>{{name}}</h3>
+  <div class="thumbres"><img width="400" height="400" src="{{thumb}}"/></div>
+  <p>  
+    <i>{{localize "mtte.searchBy"}}</i>
+  </p>
+  <p>  
+    {{localize "mtte.imageFrom"}} <a href="{{page}}" target="_blank">{{domain}}</a>
+  </p>
+  <p>  
+    {{localize "mtte.imageSize"}} {{width}}x{{height}} px.
+  </p>
+  <p>
+    <div class="actions">
+      <button class="download" title="{{localize "mtte.downloadImageToolTip"}}"><i class="fas fa-cloud-download-alt"></i> {{localize "mtte.downloadImage"}}</button>
+      <button class="createArticle" title="{{localize "mtte.createArticleToolTip"}}"><i class="fas fa-book-open"></i> {{localize "mtte.createArticle"}}</button>
+    </div>
+  </p>
+</form>
