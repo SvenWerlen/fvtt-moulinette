@@ -2,12 +2,14 @@
 
 [Moulinette](https://github.com/SvenWerlen/moulinette) is a set of tools for importing packs of scenes, images, playlists prepared by the community.
 
-* [Moulinette Forge](#forge): import scenes into your world. Share your scenes with the community.
+* [Moulinette Forge - Scenes](#forge): import scenes into your world. Share your scenes with the community.
+* [Moulinette Forge - Game icons](#forge-game): search and import game icons from <a href="https://game-icons.net/" target="_blank">game-icons.net</a>.
+* [Moulinette Forge - Image search](#forge-search): search images and generate articles.
 * [Moulinette Scribe](#scribe): install and apply translations.
 * [Install the module](#install): install the module on your Foundry VTT server.
-* [Install the module](support): install the module on your Foundry VTT server.
+* [Support me on Patreon](#support)
 
-## <a name="forge"/>Moulinette Forge
+## <a name="forge"/>Moulinette Forge - Scenes
 
 You're a GM (game master) preparing a new scenario? Moulinette Forge lets you browse a catalog of scenes shared by the community. 
 * Search in the catalog
@@ -27,6 +29,26 @@ You are a map designer and have prepared some scenes you'd like to share? Moulin
 * It will show up in the forge after the review process is completed!
 
 ![Catalog](docs/img/moulinette-forge3.jpg)
+
+## <a name="forge-game"/>Moulinette Forge - Game icons
+
+You need icons for your game (actions, items, etc.). 
+* Search <a href="https://game-icons.net/" target="_blank">game-icons.net</a> catalog
+* Check the icons you want to import
+* Choose your favorite colors (foreground/background)
+* Forge!
+
+![Game icons](docs/img/moulinette-forge-game.jpg)
+
+## <a name="forge-search"/>Moulinette Forge - Image search
+
+You need images to enrich your game/campaign 
+* Search using <a href="https://www.bing.com" target="_blank">bing.com</a> engine
+* Preview the image
+* Download or generate a journal article
+* Forge!
+
+![Game icons](docs/img/moulinette-forge-bing.jpg)
 
 ## <a name="scribe"/>Moulinette Scribe
 
@@ -55,6 +77,13 @@ To **manually install** the module, follow these instructions:
 3. Click Install and wait for installation to complete 
 
 ![Install custom module](docs/img/moulinette-install.jpg)
+
+## <a name="openUI"/>Open Moulinette interface
+
+There are 3 different ways to open the user intervace:
+* Shortcut : `CTRL + M`
+* Button available in the `Parameters` tab
+* Macro avaiable in the Moulinette macros compendium
 
 ### Why Moulinette is not available in the official list ?
 
