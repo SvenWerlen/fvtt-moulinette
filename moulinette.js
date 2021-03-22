@@ -1,5 +1,9 @@
 
 import { Moulinette } from "./scripts/moulinette-lib.js"
+//import * as zip from "@zip.js/zip.js";
+//import * as zip from "./scripts/zip.min.js";
+//console.log(zip)
+//console.log(zip.ZipReader)
 
 Hooks.once("init", async function () {
   console.log("Moulinette | Init")
@@ -13,6 +17,13 @@ Hooks.once("init", async function () {
   game.settings.register("moulinette", "gIconBgColor", { scope: "world", config: false, type: String, default: "#000000" })
   game.settings.register("moulinette", "currentTab", { scope: "world", config: false, type: String, default: "scenes" })
   
+  //const reader = new zip.HttpReader
+  //const reader = new zip.ZipReader(new zip.HttpReader("https://www.patreon.com/file?h=27576090&i=3959878"))
+  //console.log(reader)
+  //const reader = new zip.TextReader("test")
+  //const blob = null;
+  //const reader = new zip.ZipReader(new zip.BlobReader(blob));
+
   game.moulinette = {
     Moulinette
   }
@@ -23,6 +34,7 @@ Hooks.once("init", async function () {
     "modules/fvtt-moulinette/templates/forge-scenes.hbs",
     "modules/fvtt-moulinette/templates/forge-gameicons.hbs",
     "modules/fvtt-moulinette/templates/forge-imagesearch.hbs",
+    "modules/fvtt-moulinette/templates/forge-tilesearch.hbs",
   ];
 
   // Load the template parts
@@ -47,6 +59,7 @@ Hooks.once("ready", async function () {
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/scenes");
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/transl");
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/images");
+    await Moulinette.createFolderIfMissing("moulinette", "moulinette/tiles");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/babele");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/core");
     

@@ -11,8 +11,11 @@
     "mtte.learnMore": "to learn more about Moulinette and/or support it.",
     "mtte.forge": "Forge!",
     
-    "mtte.forgeWelcome": "Instructions : check all resources you want Moulinette to forge.",
-    "mtte.forgeWelcomeSearch": "Instructions : search then click for action.",
+    "mtte.forgeWelcome.scenes": "Instructions : check all scenes you want Moulinette to forge.",
+    "mtte.forgeWelcome.gameicons": "Instructions : search and check all icons you want Moulinette to forge.",
+    "mtte.forgeWelcome.imagesearch": "Instructions : search then click for action.",
+    "mtte.forgeWelcome.tilesearch": "Instructions : search then click for action.",
+    
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
     "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
@@ -101,6 +104,15 @@
     "mtte.imageSearch": "Images",
     "mtte.bingSearch": "Search provided by Microsoft Bing engine",
     
+    "mtte.tileSearch": "Tiles",
+    "mtte.tileSearchDescr": "Search provided by Moulinette. Assets under license",
+    "mtte.tileresult": "Tile result",
+    "mtte.license": "License",
+    
+    "mtte.createTile": "Create tile",
+    "mtte.createTileToolTip": "Generates a tile and adds it to the current scene",
+    "mtte.dragTile": "Drag tile and drop it on your scene",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
@@ -120,6 +132,9 @@
     
     "ERROR.mtteNoBabele": "You installed a translation for Babele BUT you don't have Babele installed or the module is NOT active",
     "ERROR.mtteDownloadTimeout": "Website hosting the image didn't respond. Try again later!",
+    "ERROR.mtteDownload": "Image couldn't be downloaded from website. Try again later!",
+    
+    "ERROR.mtteCreateTile": "In order to create a tile, drag the image and drop it on the scene!",
     
     "mtte.END": ""
 }

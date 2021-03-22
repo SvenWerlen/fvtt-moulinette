@@ -99,6 +99,10 @@
   border: none;
   margin: 2px;
 }
+
+.mtte .thumbres.draggable {
+  cursor: grab;
+}
   
 .mtte .thumb { 
   overflow: hidden;
