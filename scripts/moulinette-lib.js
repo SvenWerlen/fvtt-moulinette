@@ -155,12 +155,15 @@ class MoulinetteForge extends FormApplication {
   
   static get TABS() { return ["scenes", "gameicons", "imagesearch", "tilesearch"] }
   
-  constructor(tab = "scenes") {
+  constructor() {
     super()
     const curTab = game.settings.get("moulinette", "currentTab")
     this.tab = MoulinetteForge.TABS.includes(curTab) ? curTab : "scenes"
+    
+    // specific to Tiles
     this.tiles = []
     this.tilesPacks = []
+    this.tilesCount = 0
   }
   
   static get defaultOptions() {
@@ -169,7 +172,7 @@ class MoulinetteForge extends FormApplication {
       classes: ["mtte", "forge"],
       title: game.i18n.localize("mtte.moulinetteForge"),
       template: "modules/fvtt-moulinette/templates/forge.hbs",
-      width: 600,
+      width: 750,
       height: "auto",
       resizable: true,
       dragDrop: [{dragSelector: ".draggable"}],
@@ -184,24 +187,36 @@ class MoulinetteForge extends FormApplication {
       return { desc: desc, error: game.i18n.localize("ERROR.mtteGMOnly") }
     }
     
-    let client = new MoulinetteClient()
-    let lists = await client.get("/bundler/fvtt/packs")
-    if( lists && lists.status == 200 ) {
-      this.lists = lists.data
-      let scCount = 0;
-      this.lists.scenes.forEach( sc => { 
-        sc.source = { name: sc.source.split('|')[0], url: sc.source.split('|')[1] } 
-        scCount += sc.scenesCount
-      })
-      return { 
-        desc: desc, 
-        lists: this.lists, scCount: scCount, scenesActive: this.tab == "scenes", gameIconsActive: this.tab == "gameicons" , imageSearchActive: this.tab == "imagesearch", tileSearchActive: this.tab == "tilesearch",
-        fgColor: game.settings.get("moulinette", "gIconFgColor"), bgColor: game.settings.get("moulinette", "gIconBgColor")
+    let data = { desc: desc, scenesActive: this.tab == "scenes", gameIconsActive: this.tab == "gameicons" , imageSearchActive: this.tab == "imagesearch", tileSearchActive: this.tab == "tilesearch" }
+
+    if(this.tab == "scenes") {
+      let client = new MoulinetteClient()
+      let lists = await client.get("/bundler/fvtt/packs")
+      if( lists && lists.status == 200 ) {
+        let scCount = 0;
+        this.lists = lists.data
+        this.lists.scenes.forEach( sc => { 
+          sc.source = { name: sc.source.split('|')[0], url: sc.source.split('|')[1] } 
+          scCount += sc.scenesCount
+        })
+        data.lists = this.lists
+        data.scCount = scCount
+      } else {
+        console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
+        return { desc: desc, error: game.i18n.localize("ERROR.mtteServerCommunication") }
       }
-    } else {
-      console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
-      return { desc: desc, error: game.i18n.localize("ERROR.mtteServerCommunication") }
     }
+    else if(this.tab == "gameicons") {
+      data.fgColor = game.settings.get("moulinette", "gIconFgColor")
+      data.bgColor = game.settings.get("moulinette", "gIconBgColor")
+    }
+    else if(this.tab == "tilesearch") {
+      await this._buildTileIndex()
+      let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name } } ).sort( (a,b) => a.name > b.name ? 1 : -1 )
+      data.packs = packs
+      data.count = this.tilesCount
+    }
+    return data
   }
 
   activateListeners(html) {
@@ -239,6 +254,15 @@ class MoulinetteForge extends FormApplication {
     
     // hide error/success message on anychange
     html.find(".check").click(this._hideMessagebox.bind(this));
+    
+    // tile search (filter on pack)
+    const parent = this
+    html.find("select.packlist").on('change', function() {
+      html.find(".searchinput").val("")
+      parent.filter = ""
+      parent.filterPack = this.value
+      parent._searchTiles()
+    });
     
     // enable alt _alternateColors
     this._alternateColors()
@@ -298,7 +322,7 @@ class MoulinetteForge extends FormApplication {
   
   async _searchImages() {
     console.log("Moulinette | Searching images... " + this.filter)
-    if(this.filter.length < 2) return this.html.find("#images").html("")
+    if(this.filter.length < 3) return this.html.find("#images").html("")
     
     // execute search
     let client = new MoulinetteClient()
@@ -316,14 +340,7 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
-  async _searchTiles() {
-    console.log("Moulinette | Searching tiles ... " + this.filter)
-    if(this.filter.length < 2) return this.html.find("#images").html("")
-    
-    // execute search
-    let client = new MoulinetteClient()
-    let result = await client.post("/search", { query: this.filter })
-    
+  async _buildTileIndex() {
     // build tiles' index
     if(this.tiles.length == 0) {
       const response = await fetch(MoulinetteClient.SERVER_URL + "/assets/data.json").catch(function(e) {
@@ -334,17 +351,26 @@ class MoulinetteForge extends FormApplication {
       let idx = 0;
       for(const pub of data) {
         for(const pack of pub.packs) {
-          this.tilesPacks.push({ publisher: pub.publisher, pubWebsite: pub.website, name: pack.name, url: pack.url, license: pack.license, licenseUrl: pack.licenseUrl, path: pack.path })
+          this.tilesPacks.push({ publisher: pub.publisher, pubWebsite: pub.website, name: pack.name, url: pack.url, license: pack.license, licenseUrl: pack.licenseUrl, path: pack.path, count: pack.assets.length })
           for(const asset of pack.assets) {
             this.tiles.push({ pack: idx, filename: asset})
           }
           idx++;
+          this.tilesCount += pack.assets.length
         }
       }
     }
-    
+  }
+  
+  async _searchTiles() {
+    console.log("Moulinette | Searching tiles ... " + this.filter)
+    if(this.filter.length < 3 && this.filterPack < 0) return this.html.find("#tiles").html("")
+      
     const filters = this.filter.toLowerCase().split(" ")
     const filtered = this.tiles.filter( t => {
+      // pack doesn't match selection
+      if( this.filterPack >= 0 && t.pack != this.filterPack ) return false
+      // check if text match
       for( const f of filters ) {
         if( t.filename.toLowerCase().indexOf(f) < 0 ) return false
       }
@@ -389,7 +415,7 @@ class MoulinetteForge extends FormApplication {
       const tile = this.searchResults[idx-1]
       const pack = this.tilesPacks[tile.pack]
       const folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
-      const imageName = tile.filename
+      const imageName = tile.filename.split('/').pop()
       const filePath = `moulinette/tiles/${folderName}/${imageName}`
  
       // Set drag data
@@ -541,6 +567,16 @@ class MoulinetteForge extends FormApplication {
       .catch(err => {
         console.warn("Moulinette | Not able to copy path into clipboard")
       });
+    }
+    else if (source.classList.contains("listPacks")) {
+      // sort
+      let list = duplicate(this.tilesPacks)
+      list.sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
+      
+      let html = `<table class="mttedialog listPacks"><tr><th>${game.i18n.localize("mtte.publisher")}</th><th>${game.i18n.localize("mtte.pack")}</th><th class="num">#</th><th>${game.i18n.localize("mtte.license")}</th></tr>`
+      list.forEach( t => html += `<tr><td><a href="${t.pubWebsite}" target="_blank">${t.publisher}</a></td><td><a href="${t.url}" target="_blank">${t.name}</a></td><td class="num">${t.count}</td><td><a href="${t.licenseUrl}" target="_blank">${t.license}</a></td></tr>`)
+      html += "</table>"
+      new Dialog({title: game.i18n.localize("mtte.installingPacks"), content: html, buttons: {}}, { width: 650, height: "auto" }).render(true);
     }
   }
   
@@ -1173,7 +1209,7 @@ class MoulinetteTileResult extends FormApplication {
     super()
     this.data = tile;
     this.data.pack = pack;
-    this.imageName = this.data.filename
+    this.imageName = this.data.filename.split('/').pop()
     this.folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
     this.filePath = `moulinette/tiles/${this.folderName}/${this.imageName}`
   }

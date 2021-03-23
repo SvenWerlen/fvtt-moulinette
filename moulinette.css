@@ -159,5 +159,17 @@
 }
 
 .mtte .searchinput {
-  width: 540px;
+  width: 460px;
+}
+
+.mttedialog.listPacks th {
+  text-align: left;
+}
+
+.mttedialog.listPacks td, .mttedialog.listPacks th {
+  padding-right: 20px;
+}
+
+.mttedialog.listPacks td.num, .mttedialog.listPacks th.num {
+  text-align: right;
 }

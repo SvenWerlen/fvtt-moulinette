@@ -105,13 +105,20 @@
     "mtte.bingSearch": "Search provided by Microsoft Bing engine",
     
     "mtte.tileSearch": "Tiles",
-    "mtte.tileSearchDescr": "Search provided by Moulinette. Assets under license",
+    "mtte.tileSearchDescr": "Search provided by Moulinette. Check available packs for copyrights.",
     "mtte.tileresult": "Tile result",
     "mtte.license": "License",
     
     "mtte.createTile": "Create tile",
     "mtte.createTileToolTip": "Generates a tile and adds it to the current scene",
     "mtte.dragTile": "Drag tile and drop it on your scene",
+    
+    "mtte.listAvailablePacks": "See available packs",
+    "mtte.listAvailablePacksToolTip": "Displays all available packs",
+    "mtte.availablePacks": "Available tiles packs",
+    "mtte.publisher": "Publisher",
+    "mtte.pack": "Pack",
+    "mtte.allPacks": "All packs",
     
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
