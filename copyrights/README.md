@@ -7,11 +7,20 @@ This page provides information about copyrights and authorisations from the owne
 ### Scenes
 
 * **Bobours on Inkarnate**: see authorisations for Moulinette [bobours1.jpg](bobours1.jpg) and [bobours2.jpg](bobours2.jpg)
-* **SteelRat on RPGMapShare**: [CC Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/). Moulinette gives appropriate credit and is then free to share them.
+* **SteelRat on RPGMapShare**: [CC Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/). Moulinette gives appropriate credit and is then free to redistribute them.
 
 ### Game Icons
 
 Icons from [game-icons.net](https://game-icons.net/) are provided under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) license. Moulinette gives appropriate credit and is then free to share them.
+
+### Image Search
+
+Image search is provided by Microsoft Bing engine. Moulinette owns a valid subscription for using this service. 
+Found and downloaded images are the intellectual property of their owners. Moulinette provides the link to the site to check the copyright of the images.
+
+### Tiles
+
+* **Forgotten Adventures**: all available packs are provided under [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Moulinette gives appropriate credit and is then free to redistribute the material in any medium or format.
 
 ## Moulinette Scribe
 

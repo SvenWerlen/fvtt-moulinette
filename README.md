@@ -5,6 +5,7 @@
 * [Moulinette Forge - Scenes](#forge): import scenes into your world. Share your scenes with the community.
 * [Moulinette Forge - Game icons](#forge-game): search and import game icons from <a href="https://game-icons.net/" target="_blank">game-icons.net</a>.
 * [Moulinette Forge - Image search](#forge-search): search images and generate articles.
+* [Moulinette Forge - Tiles](#forge-tiles): search tiles and drop them on your maps.
 * [Moulinette Scribe](#scribe): install and apply translations.
 * [Install the module](#install): install the module on your Foundry VTT server.
 * [Support me on Patreon](#support)
@@ -50,9 +51,19 @@ You need images to enrich your game/campaign
 
 ![Game icons](docs/img/moulinette-forge-bing.jpg)
 
+## <a name="forge-tiles"/>Moulinette Forge - Tiles
+
+You want to add tiles on your maps?
+* Search using Moulinette engine
+* See publisher and license (generally [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0))
+* Drag and drop tiles 
+* Voilà!
+
+![Game icons](docs/img/moulinette-forge-tile.jpg)
+
 ## <a name="scribe"/>Moulinette Scribe
 
-Scribe is intended for non-english communities. Moulinette Scribe lets you browse a catalog of available translations maintain by the communities
+Scribe is intended for non-english communities. Moulinette Scribe lets you browse a catalog of available translations maintained by the communities
 * Search in the catalog (use smart filters!)
 * Check the translations you want to install
 * Scribe!
@@ -93,6 +104,8 @@ Moulinette in any forum of Foundry VTT. Spread the word!
 
 ## <a name="support"/>Support me on Patreon
 
-If you like my work and want to support me, consider becoming a patreon or throwing a buck or two at me!
+If you like my work and want to support me, consider becoming a patreon!
 
 [https://www.patreon.com/moulinette](https://www.patreon.com/moulinette)
+
+You can also join [Moulinette Discord](https://discord.gg/xg3dcMQfP2)
