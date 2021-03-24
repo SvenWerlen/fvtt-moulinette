@@ -64,11 +64,12 @@ Hooks.once("ready", async function () {
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/core");
     
     // open moulinette on CTRL+M
-    document.onkeydown = function (evt) {
-        if(evt.key == "m" && evt.ctrlKey && !evt.altKey && !evt.metaKey) {
-          game.moulinette.Moulinette.showMoulinette()
-        }
-    };
+    document.addEventListener("keydown", evt => {
+      evt.preventDefault();  
+      if(evt.key == "m" && evt.ctrlKey && !evt.altKey && !evt.metaKey) {
+        game.moulinette.Moulinette.showMoulinette()
+      }
+    });
   }
 });
 
