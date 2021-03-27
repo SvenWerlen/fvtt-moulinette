@@ -24,6 +24,10 @@ Hooks.once("init", async function () {
   //const blob = null;
   //const reader = new zip.ZipReader(new zip.BlobReader(blob));
 
+  Handlebars.registerHelper('decode', function(text) {
+    return decodeURI(text)
+  });
+  
   game.moulinette = {
     Moulinette
   }
@@ -35,6 +39,7 @@ Hooks.once("init", async function () {
     "modules/fvtt-moulinette/templates/forge-gameicons.hbs",
     "modules/fvtt-moulinette/templates/forge-imagesearch.hbs",
     "modules/fvtt-moulinette/templates/forge-tilesearch.hbs",
+    "modules/fvtt-moulinette/templates/forge-customsearch.hbs",
   ];
 
   // Load the template parts
@@ -62,10 +67,10 @@ Hooks.once("ready", async function () {
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/tiles");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/babele");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/core");
+    await Moulinette.createFolderIfMissing("moulinette/images", "moulinette/images/custom");
     
     // open moulinette on CTRL+M
     document.addEventListener("keydown", evt => {
-      evt.preventDefault();  
       if(evt.key == "m" && evt.ctrlKey && !evt.altKey && !evt.metaKey) {
         game.moulinette.Moulinette.showMoulinette()
       }

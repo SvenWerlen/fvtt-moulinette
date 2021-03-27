@@ -1,20 +1,20 @@
 <div class="main">
   <p>
-    <div class="description">{{localize "mtte.tileSearchDescr"}}.</div>
+    <div class="description">{{localize "mtte.customSearchDescr"}}.</div>
     <div class="search">
       <input id="searchTiles" class="searchinput" type="text" placeholder="{{localize "mtte.search"}}"></input>
+      <button class="search"><i class="fas fa-search"></i></button>
       <select class="packlist">
       <option value="-1">{{localize "mtte.allPacks"}} ({{count}})</option>
       {{#each packs as |p|}}<option value="{{p.id}}">{{p.name}}</option>{{/each}}
       </select>
-      <button class="search"><i class="fas fa-search"></i></button>
     </div>
     <div id="tiles" class="list">
     </div>
   </p>
   <p>
     <div class="actions">
-      <button class="listPacks" title="{{localize "mtte.listAvailablePacksToolTip"}}"><i class="fas fa-info-circle"></i> {{localize "mtte.listAvailablePacks"}}</button>
+      <button class="indexImages" title="{{localize "mtte.indexImagesToolTip"}}"><i class="fas fa-sync"></i> {{localize "mtte.indexImages"}}</button>
     </div>
   </p>
   <p>

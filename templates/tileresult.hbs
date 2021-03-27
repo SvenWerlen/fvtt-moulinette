@@ -1,16 +1,29 @@
 <form autocomplete="off" onsubmit="event.preventDefault();">
-  <h3>{{filename}}</h3>
+  <h3>{{decode filename}}</h3>
   <div class="thumbres draggable"><img width="400" height="400" src="{{thumb}}" title="{{localize "mtte.dragTile"}}"/></div>
   <p>  
     <i>Search provided by <a href="https://www.patreon.com/moulinette">Moulinette</a>.</i>
   </p>
+  {{#if pack.pubWebsite}}
   <p>  
     {{localize "mtte.imageFrom"}} <a href="{{pack.pubWebsite}}" target="_blank">{{pack.publisher}}</a> (<a href="{{pack.url}}" target="_blank">{{pack.name}}</a>)
   </p>
+  {{/if}}
+  {{#unless pack.pubWebsite}}
+  <p>  
+    {{localize "mtte.imageFrom"}} {{pack.publisher}} ({{pack.name}})
+  </p>
+  {{/unless}}
+  {{#if pack.licenseUrl}}
   <p>  
     {{localize "mtte.license"}} <a href="{{pack.licenseUrl}}" target="_blank">{{pack.license}}</a>
   </p>
-  
+  {{/if}}
+  {{#unless pack.pubWebsite}}
+  <p>  
+    {{localize "mtte.license"}} {{localize "mtte.unknownLicense"}}
+  </p>
+  {{/unless}}
   <p>
     <div class="actions">
       <button class="download" title="{{localize "mtte.downloadImageToolTip"}}"><i class="fas fa-cloud-download-alt"></i> {{localize "mtte.downloadImage"}}</button>

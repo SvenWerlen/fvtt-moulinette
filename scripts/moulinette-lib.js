@@ -51,6 +51,7 @@ class MoulinetteClient {
 
 export class Moulinette {
   
+  static FOLDER_CUSTOM = "/moulinette/images/custom"
   static lastSelectedInitiative = 0
   static lastAuthor = ""
   
@@ -153,7 +154,7 @@ class MoulinetteHome extends FormApplication {
  *************************/
 class MoulinetteForge extends FormApplication {
   
-  static get TABS() { return ["scenes", "gameicons", "imagesearch", "tilesearch"] }
+  static get TABS() { return ["scenes", "gameicons", "imagesearch", "tilesearch", "customsearch"] }
   
   constructor() {
     super()
@@ -187,7 +188,13 @@ class MoulinetteForge extends FormApplication {
       return { desc: desc, error: game.i18n.localize("ERROR.mtteGMOnly") }
     }
     
-    let data = { desc: desc, scenesActive: this.tab == "scenes", gameIconsActive: this.tab == "gameicons" , imageSearchActive: this.tab == "imagesearch", tileSearchActive: this.tab == "tilesearch" }
+    let data = { desc: desc, 
+      scenesActive: this.tab == "scenes", 
+      gameIconsActive: this.tab == "gameicons", 
+      imageSearchActive: this.tab == "imagesearch",
+      tileSearchActive: this.tab == "tilesearch",
+      customSearchActive: this.tab == "customsearch"
+    }
 
     if(this.tab == "scenes") {
       let client = new MoulinetteClient()
@@ -211,11 +218,18 @@ class MoulinetteForge extends FormApplication {
       data.bgColor = game.settings.get("moulinette", "gIconBgColor")
     }
     else if(this.tab == "tilesearch") {
-      await this._buildTileIndex()
+      await this._buildTileIndex(MoulinetteClient.SERVER_URL + "/assets/data.json")
       let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name } } ).sort( (a,b) => a.name > b.name ? 1 : -1 )
       data.packs = packs
       data.count = this.tilesCount
     }
+    else if(this.tab == "customsearch") {
+      await this._buildTileIndex("moulinette/images/custom/index.json")
+      let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name } } ).sort( (a,b) => a.name > b.name ? 1 : -1 )
+      data.packs = packs
+      data.count = this.tilesCount
+    }
+    
     return data
   }
 
@@ -235,9 +249,6 @@ class MoulinetteForge extends FormApplication {
       window._alternateColors();
       window._hideMessagebox();
     }).focus();
-    
-    // search on ENTER
-    html.find(".searchinput").on("keyup", this._onSearch.bind(this)).focus();
     
     // click on tabs
     html.find(".tabs a").click(this._onNavigate.bind(this));
@@ -266,26 +277,6 @@ class MoulinetteForge extends FormApplication {
     
     // enable alt _alternateColors
     this._alternateColors()
-  }
-  
-  _onSearch(event) {
-    event.preventDefault();
-    const source = event.currentTarget;
-    var charCode = (typeof event.which === "number") ? event.which : event.keyCode;
-    if(charCode != 13) return; // only react to ENTER
-    
-    const newSearch = $(source).val()
-    if(newSearch == this.filter) return;
-    this.filter = newSearch
-    
-    if(this.tab == "gameicons") {
-      //this.timeout = setTimeout(this._searchGameIcons.bind(this), 500)
-      this._searchGameIcons()
-    } else if(this.tab == "imagesearch") {
-      this._searchImages()
-    } else if(this.tab == "tilesearch") {
-      this._searchTiles()
-    }
   }
   
   async _searchGameIcons() {
@@ -340,13 +331,14 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
-  async _buildTileIndex() {
+  async _buildTileIndex(URL) {
     // build tiles' index
     if(this.tiles.length == 0) {
-      const response = await fetch(MoulinetteClient.SERVER_URL + "/assets/data.json").catch(function(e) {
+      const response = await fetch(URL, {cache: "no-store"}).catch(function(e) {
         console.log(`Moulinette | Cannot download tiles/asset list`, e)
         return;
       });
+      if(response.status != 200) return;
       const data = await response.json();
       let idx = 0;
       for(const pub of data) {
@@ -382,7 +374,8 @@ class MoulinetteForge extends FormApplication {
     let idx = 0;
     filtered.forEach( r => {
       idx++
-      r.thumb = `${MoulinetteClient.SERVER_URL}/assets/${this.tilesPacks[r.pack].path}/${r.filename}`
+      const URL = (this.tab == "tilesearch" ? `${MoulinetteClient.SERVER_URL}/assets/` : "")
+      r.thumb = `${URL}${this.tilesPacks[r.pack].path}/${r.filename}`
       html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.thumb}"/></div>` 
     })
     
@@ -400,9 +393,9 @@ class MoulinetteForge extends FormApplication {
     if(this.searchResults && idx > 0 && idx <= this.searchResults.length) {
       if(this.tab == "imagesearch") {
         new MoulinetteSearchResult(this.searchResults[idx-1]).render(true)
-      } else if(this.tab == "tilesearch") {
+      } else if(this.tab == "tilesearch" || this.tab == "customsearch") {
         const result = this.searchResults[idx-1]
-        new MoulinetteTileResult(duplicate(result), duplicate(this.tilesPacks[result.pack])).render(true)
+        new MoulinetteTileResult(duplicate(result), duplicate(this.tilesPacks[result.pack]), this.tab).render(true)
       }
     }
   }
@@ -412,28 +405,44 @@ class MoulinetteForge extends FormApplication {
     const div = event.currentTarget;
     const idx = div.dataset.idx;
     if(this.searchResults && idx > 0 && idx <= this.searchResults.length) { 
-      const tile = this.searchResults[idx-1]
-      const pack = this.tilesPacks[tile.pack]
-      const folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
-      const imageName = tile.filename.split('/').pop()
-      const filePath = `moulinette/tiles/${folderName}/${imageName}`
- 
-      // Set drag data
-      const dragData = {
-        type: "Tile",
-        img: filePath,
-        tileSize: 100
-      };
-      event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
- 
-      // download & upload image
-      fetch(tile.thumb).catch(function(e) {
-        ui.notifications.error(game.i18n.format("ERROR.mtteDownload"));
-        console.log(`Moulinette | Cannot download image ${imageName}`, e)
-        return;
-      }).then( res => {
-        res.blob().then( blob => Moulinette.upload(new File([blob], imageName, { type: blob.type, lastModified: new Date() }), imageName, "moulinette/tiles", `moulinette/tiles/${folderName}`, false) )
-      });
+      
+      if(this.tab == "customsearch") {
+        const tile = this.searchResults[idx-1]
+        const pack = this.tilesPacks[tile.pack]
+        const filePath = `${pack.path}${tile.filename}`
+  
+        // Set drag data
+        const dragData = {
+          type: "Tile",
+          img: filePath,
+          tileSize: 100
+        };
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+      }
+      else if(this.tab == "tilesearch") {
+        const tile = this.searchResults[idx-1]
+        const pack = this.tilesPacks[tile.pack]
+        const folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
+        const imageName = tile.filename.split('/').pop()
+        const filePath = `moulinette/tiles/${folderName}/${imageName}`
+  
+        // Set drag data
+        const dragData = {
+          type: "Tile",
+          img: filePath,
+          tileSize: 100
+        };
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+  
+        // download & upload image
+        fetch(tile.thumb).catch(function(e) {
+          ui.notifications.error(game.i18n.format("ERROR.mtteDownload"));
+          console.log(`Moulinette | Cannot download image ${imageName}`, e)
+          return;
+        }).then( res => {
+          res.blob().then( blob => Moulinette.upload(new File([blob], imageName, { type: blob.type, lastModified: new Date() }), imageName, "moulinette/tiles", `moulinette/tiles/${folderName}`, false) )
+        });
+      }
       
       // Create the drag preview for the image
       /*
@@ -469,7 +478,10 @@ class MoulinetteForge extends FormApplication {
     const source = event.currentTarget;
     const tab = source.dataset.tab;
     if(MoulinetteForge.TABS.includes(tab)) {
-      this.tab = tab;
+      this.tab = tab
+      // clear tiles cache
+      this.tiles.length = 0
+      this.tilesPacks.length = 0
       game.settings.set("moulinette", "currentTab", tab)
       this.render();
     }
@@ -497,7 +509,7 @@ class MoulinetteForge extends FormApplication {
         this._searchGameIcons()
       } else if(this.tab == "imagesearch") {
         this._searchImages()
-      } else if(this.tab == "tilesearch") { 
+      } else if(this.tab == "tilesearch" || this.tab == "customsearch") { 
         this._searchTiles()
       }
     }
@@ -578,8 +590,48 @@ class MoulinetteForge extends FormApplication {
       html += "</table>"
       new Dialog({title: game.i18n.localize("mtte.installingPacks"), content: html, buttons: {}}, { width: 650, height: "auto" }).render(true);
     }
+    else if (source.classList.contains("indexImages")) {
+      ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
+      this.html.find(".indexImages").prop("disabled", true);
+      // first level = publishers
+      let publishers = []
+      let dir1 = await FilePicker.browse(Moulinette.getSource(), Moulinette.FOLDER_CUSTOM);
+      for(const pub of dir1.dirs) {
+        let publisher = { publisher: decodeURI(pub.split('/').pop()), packs: [] }
+        // second level = packs
+        let dir2 = await FilePicker.browse(Moulinette.getSource(), pub);
+        for(const pack of dir2.dirs) {
+          let files = await MoulinetteForge._scanFolder(pack, ["gif","jpg","jpeg","png","webp"]);
+          // remove pack path from file path
+          files = files.map( (path) => { return path.substring(pack.length) } )
+          publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
+        }
+        publishers.push(publisher)
+      }
+      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM, true)
+      console.log(publishers)
+      ui.notifications.info(game.i18n.format("mtte.indexingDone"));
+      this.render()
+    }
   }
   
+  
+  /**
+   * Returns the list of all images in folder (and its subfolders)
+   */
+  static async _scanFolder(path, filter) {
+    let list = []
+    const base = await FilePicker.browse(Moulinette.getSource(), path);
+    let baseFiles = filter ? base.files.filter(f => filter.includes(f.split(".").pop().toLowerCase())) : base.files
+    list.push(...baseFiles)
+    for(const d of base.dirs) {
+      const files = await MoulinetteForge._scanFolder(d, filter)
+      list.push(...files)
+    }
+    return list
+  }
+    
+    
   async _installScenes(selected) {
     event.preventDefault();
     if(!this.lists || !this.lists.scenes) {
@@ -1205,13 +1257,19 @@ class MoulinetteSearchResult extends FormApplication {
  *************************/
 class MoulinetteTileResult extends FormApplication {
   
-  constructor(tile, pack) {
+  constructor(tile, pack, tab) {
     super()
+    this.tab = tab
     this.data = tile;
     this.data.pack = pack;
-    this.imageName = this.data.filename.split('/').pop()
-    this.folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
-    this.filePath = `moulinette/tiles/${this.folderName}/${this.imageName}`
+    
+    if(tab == "tilesearch") {
+      this.imageName = this.data.filename.split('/').pop()
+      this.folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
+      this.filePath = `moulinette/tiles/${this.folderName}/${this.imageName}`
+    } else if(tab == "customsearch") {
+      this.filePath = `${pack.path}${tile.filename}`
+    }
   }
   
   static get defaultOptions() {
@@ -1261,7 +1319,9 @@ class MoulinetteTileResult extends FormApplication {
     //event.dataTransfer.setDragImage(preview, w/2, h/2);
     event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
     
-    this._downloadFile()
+    if(this.tab == "tilesearch") {
+      this._downloadFile()
+    }
   }
 
   async _downloadFile() {

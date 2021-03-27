@@ -11,6 +11,7 @@
       <a class="item {{#if gameIconActive}}active{{/if}}" data-tab="gameicons"><i class="fas fa-file-image"></i> {{localize "mtte.gameIcons"}}</a>
       <a class="item {{#if imageSearchActive}}active{{/if}}" data-tab="imagesearch"><i class="fas fa-images"></i> {{localize "mtte.imageSearch"}}</a>
       <a class="item {{#if tileSearchActive}}active{{/if}}" data-tab="tilesearch"><i class="fas fa-puzzle-piece"></i> {{localize "mtte.tileSearch"}}</a>
+      <a class="item {{#if customSearchActive}}active{{/if}}" data-tab="customsearch"><i class="fas fa-toolbox"></i> {{localize "mtte.customSearch"}}</a>
     </nav>
 
     {{#if scenesActive}}
@@ -25,10 +26,15 @@
     {{#if tileSearchActive}}
       {{> "modules/fvtt-moulinette/templates/forge-tilesearch.hbs"}}
     {{/if}}
+    {{#if customSearchActive}}
+      {{> "modules/fvtt-moulinette/templates/forge-customsearch.hbs"}}
+    {{/if}}
   
   {{/unless}}
-  <p><em>
+  <img class="logo" src="modules/fvtt-moulinette/img/moulinette-icon.png" width="60"/>
+  <p>
+    Become a <a href="https://www.patreon.com/moulinette" target="_blank">Patron</a> to support Moulinette.<br/>
+    Join me on <a href="https://discord.gg/xg3dcMQfP2" target="_blank">Moulinette Discord</a> to follow development. <br/>
     <a href="https://github.com/SvenWerlen/moulinette">{{localize "mtte.seeDoc"}}</a> {{localize "mtte.learnMore"}}
-  </em></p>
-  
+  </p>
 </form>

@@ -15,6 +15,7 @@
     "mtte.forgeWelcome.gameicons": "Instructions : search and check all icons you want Moulinette to forge.",
     "mtte.forgeWelcome.imagesearch": "Instructions : search then click for action.",
     "mtte.forgeWelcome.tilesearch": "Instructions : search then click for action.",
+    "mtte.forgeWelcome.customsearch": "Instructions : (Bring Your Own Images). Put your images on the server in 'moulinette/images/custom', press 'Index images' button. Enjoy the search and Moulinette's capabilities!",
     
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
@@ -97,7 +98,7 @@
     "mtte.lang.pt-BR": "Portuguese (Brasil)",
     "mtte.lang.sv": "Swedish",
     
-    "mtte.gameIcons": "Game-icons.net",
+    "mtte.gameIcons": "Icons",
     "mtte.backgroundColor": "Background color",
     "mtte.foregroundColor": "Foreground color",
     
@@ -108,6 +109,10 @@
     "mtte.tileSearchDescr": "Search provided by Moulinette. Check available packs for copyrights.",
     "mtte.tileresult": "Tile result",
     "mtte.license": "License",
+    "mtte.unknownLicense": "Unknown (manually imported)",
+    
+    "mtte.customSearch": "BYOI",
+    "mtte.customSearchDescr": "Search provided by Moulinette. Images provided by GM/admin.",
     
     "mtte.createTile": "Create tile",
     "mtte.createTileToolTip": "Generates a tile and adds it to the current scene",
@@ -119,6 +124,13 @@
     "mtte.publisher": "Publisher",
     "mtte.pack": "Pack",
     "mtte.allPacks": "All packs",
+    "mtte.allPubs": "All publishers",
+    
+    "mtte.indexImages": "Index images",
+    "mtte.indexImagesToolTip": "Moulinette will scan the custom folder and index all found images. You must re-index everytime the folder changes.",
+    
+    "mtte.indexingInProgress": "Moulinette is indexing your images... please wait",
+    "mtte.indexingDone": "Images successfully indexed!",
     
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
