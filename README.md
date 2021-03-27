@@ -6,6 +6,7 @@
 * [Moulinette Forge - Game icons](#forge-game): search and import game icons from <a href="https://game-icons.net/" target="_blank">game-icons.net</a>.
 * [Moulinette Forge - Image search](#forge-search): search images and generate articles.
 * [Moulinette Forge - Tiles](#forge-tiles): search tiles and drop them on your maps.
+* [Moulinette Forge - BYOI](#forge-byoi): bring your own images and let Moulinette manage them for you.
 * [Moulinette Scribe](#scribe): install and apply translations.
 * [Install the module](#install): install the module on your Foundry VTT server.
 * [Support me on Patreon](#support)
@@ -49,7 +50,7 @@ You need images to enrich your game/campaign
 * Download or generate a journal article
 * Forge!
 
-![Game icons](docs/img/moulinette-forge-bing.jpg)
+![Image search on Bing](docs/img/moulinette-forge-bing.jpg)
 
 ## <a name="forge-tiles"/>Moulinette Forge - Tiles
 
@@ -59,7 +60,17 @@ You want to add tiles on your maps?
 * Drag and drop tiles 
 * Voilà!
 
-![Game icons](docs/img/moulinette-forge-tile.jpg)
+![Tiles](docs/img/moulinette-forge-tile.jpg)
+
+## <a name="forge-byoi"/>Moulinette Forge - Bring your own images (BYOI)
+
+You created or downloaded some tokens/assets you'd like Moulinette to manage for you?
+* Put them in `moulinette/images/custom` folder.
+* Make sure to have at least a 2-depth structure (1. Publisher, 2. Pack, 3+ Images)
+* Index images
+* Moulinette provides you now the same features as for tiles (see above)
+
+![Bring your own images](docs/img/moulinette-forge-byoi.jpg)
 
 ## <a name="scribe"/>Moulinette Scribe
 
