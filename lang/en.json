@@ -75,6 +75,8 @@
     "mtte.downloadCoreSuccess": "Translations successfully installed! You'll need to refresh your page!",
     "mtte.downloadImage": "Download",
     "mtte.downloadImageToolTip": "Download image into Foundry VTT",
+    "mtte.clipboardImage": "Clipboard",
+    "mtte.clipboardImageToolTip": "Copy path into clipboard. You can then reuse elsewhere.",
     "mtte.searchBy": "Search provided by Microsoft Bing",
     "mtte.imageFrom": "Image from",
     "mtte.imageSize": "Image size",
@@ -118,6 +120,8 @@
     "mtte.createTile": "Create tile",
     "mtte.createTileToolTip": "Generates a tile and adds it to the current scene",
     "mtte.dragTile": "Drag tile and drop it on your scene",
+    "mtte.downloadImageSuccess": "Image successfully downloaded! Path copied into clipboard.",
+    "mtte.clipboardImageSuccess": "Image path successfully copied into clipboard!",
     
     "mtte.listAvailablePacks": "See available packs",
     "mtte.listAvailablePacksToolTip": "Displays all available packs",

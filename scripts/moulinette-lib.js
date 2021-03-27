@@ -68,6 +68,14 @@ export class Moulinette {
     new MoulinetteShare(scene).render(true)
   }
   
+  static showMoulinetteForge() {
+    new MoulinetteForge().render(true)
+  }
+  
+  static showMoulinetteScribe() {
+    new MoulinetteScribe().render(true)
+  }
+  
   static getSource() {
     var source = "data";
     if (typeof ForgeVTT != "undefined" && ForgeVTT.usingTheForge) {
@@ -1306,8 +1314,14 @@ class MoulinetteTileResult extends FormApplication {
     if(event.submitter.className == "createTile") {
       ui.notifications.error(game.i18n.format("ERROR.mtteCreateTile"));
       throw game.i18n.format("ERROR.mtteCreateTile");
-    } else {
+    } else if(event.submitter.className == "download") {
       this._downloadFile();
+    } else if(event.submitter.className == "clipboard") {
+      navigator.clipboard.writeText(this.data.thumb)
+      .catch(err => {
+        console.warn("Moulinette | Not able to copy path into clipboard")
+      });
+      ui.notifications.info(game.i18n.format("mtte.clipboardImageSuccess"));
     }
   }
   
@@ -1345,6 +1359,14 @@ class MoulinetteTileResult extends FormApplication {
 
     const blob = await res.blob()
     await Moulinette.upload(new File([blob], this.imageName, { type: blob.type, lastModified: new Date() }), this.imageName, "moulinette/tiles", `moulinette/tiles/${this.folderName}`, false)
+    
+    // copy path into clipboard
+    navigator.clipboard.writeText(`moulinette/tiles/${this.folderName}/${this.imageName}`)
+    .catch(err => {
+      console.warn("Moulinette | Not able to copy path into clipboard")
+    });
+    
+    ui.notifications.info(game.i18n.format("mtte.downloadImageSuccess"));
     return true
   }
 
