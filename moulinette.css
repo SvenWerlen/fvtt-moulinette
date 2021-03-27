@@ -67,11 +67,11 @@
 }
 
 .mtte .scene, .mtte .transl { 
-  width: 400px;
+  width: 550px;
 }
 
 .mtte .gameicon {
-  width: 300px;
+  width: 450px;
   padding-left: 5px;
 }
 
@@ -159,7 +159,7 @@
 }
 
 .mtte .searchinput {
-  width: 50%;
+  width: 350px;
 }
 
 .mttedialog.listPacks th {

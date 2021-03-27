@@ -113,6 +113,7 @@
     
     "mtte.customSearch": "BYOI",
     "mtte.customSearchDescr": "Search provided by Moulinette. Images provided by GM/admin.",
+    "mtte.customSearchExample": "Looking for an example? Download",
     
     "mtte.createTile": "Create tile",
     "mtte.createTileToolTip": "Generates a tile and adds it to the current scene",
@@ -131,6 +132,16 @@
     
     "mtte.indexingInProgress": "Moulinette is indexing your images... please wait",
     "mtte.indexingDone": "Images successfully indexed!",
+    
+    "mtte.noResult": "No result found! Try with less terms or check your data.",
+    
+    "mtte.customReferences": "Looking for custom packs?",
+    "mtte.customReferencesToolTip": "Moulinette provides a list of references (ex: free tokens available to download).",
+    
+    "mtte.listPacks": "Available packs",
+    "mtte.customReferencesPacks": "Packs available on Internet",
+    "mtte.type": "Type",
+    "mtte.typeFree": "Free",
     
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",

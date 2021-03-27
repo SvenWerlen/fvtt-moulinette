@@ -173,7 +173,7 @@ class MoulinetteForge extends FormApplication {
       classes: ["mtte", "forge"],
       title: game.i18n.localize("mtte.moulinetteForge"),
       template: "modules/fvtt-moulinette/templates/forge.hbs",
-      width: 750,
+      width: 800,
       height: "auto",
       resizable: true,
       dragDrop: [{dragSelector: ".draggable"}],
@@ -217,15 +217,10 @@ class MoulinetteForge extends FormApplication {
       data.fgColor = game.settings.get("moulinette", "gIconFgColor")
       data.bgColor = game.settings.get("moulinette", "gIconBgColor")
     }
-    else if(this.tab == "tilesearch") {
-      await this._buildTileIndex(MoulinetteClient.SERVER_URL + "/assets/data.json")
-      let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name } } ).sort( (a,b) => a.name > b.name ? 1 : -1 )
-      data.packs = packs
-      data.count = this.tilesCount
-    }
-    else if(this.tab == "customsearch") {
-      await this._buildTileIndex("moulinette/images/custom/index.json")
-      let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name } } ).sort( (a,b) => a.name > b.name ? 1 : -1 )
+    else if(this.tab == "tilesearch" || this.tab == "customsearch") {
+      const URL = this.tab == "tilesearch" ? MoulinetteClient.SERVER_URL + "/assets/data.json" : "moulinette/images/custom/index.json"
+      await this._buildTileIndex(URL)
+      let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       data.packs = packs
       data.count = this.tilesCount
     }
@@ -249,6 +244,9 @@ class MoulinetteForge extends FormApplication {
       window._alternateColors();
       window._hideMessagebox();
     }).focus();
+    
+    // give focus to input text
+    html.find(".searchinput").focus();
     
     // click on tabs
     html.find(".tabs a").click(this._onNavigate.bind(this));
@@ -369,6 +367,11 @@ class MoulinetteForge extends FormApplication {
       return true;
     })
     
+    if(filtered.length == 0) {
+      ui.notifications.warn(game.i18n.format("mtte.noResult"));
+      return
+    }
+    
     let html = ""
     this.searchResults = filtered;
     let idx = 0;
@@ -457,8 +460,8 @@ class MoulinetteForge extends FormApplication {
   }
   
   _alternateColors() {
-    $('#scenePacks .pack').removeClass("alt");
-    $('#scenePacks .pack:even').addClass("alt");
+    $('.forge .pack').removeClass("alt");
+    $('.forge .pack:even').addClass("alt");
   }
   
   _displayMessage(text, type="success") {
@@ -473,16 +476,21 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
+  _clearPackLists() {
+    this.filter = ""
+    this.tilesCount = 0
+    this.tiles.length = 0
+    this.tilesPacks.length = 0
+  }
+  
   _onNavigate(event) {
     event.preventDefault();
     const source = event.currentTarget;
     const tab = source.dataset.tab;
     if(MoulinetteForge.TABS.includes(tab)) {
       this.tab = tab
-      // clear tiles cache
-      this.tiles.length = 0
-      this.tilesPacks.length = 0
       game.settings.set("moulinette", "currentTab", tab)
+      this._clearPackLists()
       this.render();
     }
   }
@@ -588,7 +596,10 @@ class MoulinetteForge extends FormApplication {
       let html = `<table class="mttedialog listPacks"><tr><th>${game.i18n.localize("mtte.publisher")}</th><th>${game.i18n.localize("mtte.pack")}</th><th class="num">#</th><th>${game.i18n.localize("mtte.license")}</th></tr>`
       list.forEach( t => html += `<tr><td><a href="${t.pubWebsite}" target="_blank">${t.publisher}</a></td><td><a href="${t.url}" target="_blank">${t.name}</a></td><td class="num">${t.count}</td><td><a href="${t.licenseUrl}" target="_blank">${t.license}</a></td></tr>`)
       html += "</table>"
-      new Dialog({title: game.i18n.localize("mtte.installingPacks"), content: html, buttons: {}}, { width: 650, height: "auto" }).render(true);
+      new Dialog({title: game.i18n.localize("mtte.listPacks"), content: html, buttons: {}}, { width: 650, height: "auto" }).render(true)
+    }
+    else if (source.classList.contains("customReferences")) {
+      new Dialog({title: game.i18n.localize("mtte.customReferencesPacks"), buttons: {}}, { id: "moulinette-info", classes: ["info"], template: "modules/fvtt-moulinette/templates/customReferences.hbs", width: 650, height: "auto" }).render(true)
     }
     else if (source.classList.contains("indexImages")) {
       ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
@@ -609,9 +620,9 @@ class MoulinetteForge extends FormApplication {
         publishers.push(publisher)
       }
       await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM, true)
-      console.log(publishers)
       ui.notifications.info(game.i18n.format("mtte.indexingDone"));
-      this.render()
+      this._clearPackLists()
+      this.render();
     }
   }
   
@@ -894,7 +905,7 @@ class MoulinetteScribe extends FormApplication {
       classes: ["mtte", "scribe"],
       title: game.i18n.localize("mtte.moulinetteScribe"),
       template: "modules/fvtt-moulinette/templates/scribe.hbs",
-      width: 600,
+      width: 800,
       height: "auto",
       closeOnSubmit: false,
       submitOnClose: false,
