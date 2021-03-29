@@ -12,6 +12,7 @@
       <a class="item {{#if imageSearchActive}}active{{/if}}" data-tab="imagesearch"><i class="fas fa-images"></i> {{localize "mtte.imageSearch"}}</a>
       <a class="item {{#if tileSearchActive}}active{{/if}}" data-tab="tilesearch"><i class="fas fa-puzzle-piece"></i> {{localize "mtte.tileSearch"}}</a>
       <a class="item {{#if customSearchActive}}active{{/if}}" data-tab="customsearch"><i class="fas fa-toolbox"></i> {{localize "mtte.customSearch"}}</a>
+      <a class="item {{#if customAudioActive}}active{{/if}}" data-tab="customaudio"><i class="fas fa-music"></i> {{localize "mtte.customAudio"}}</a>
     </nav>
 
     {{#if scenesActive}}
@@ -28,6 +29,9 @@
     {{/if}}
     {{#if customSearchActive}}
       {{> "modules/fvtt-moulinette/templates/forge-customsearch.hbs"}}
+    {{/if}}
+    {{#if customAudioActive}}
+      {{> "modules/fvtt-moulinette/templates/forge-customaudio.hbs"}}
     {{/if}}
   
   {{/unless}}

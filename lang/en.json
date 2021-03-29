@@ -16,6 +16,7 @@
     "mtte.forgeWelcome.imagesearch": "Instructions : search then click for action.",
     "mtte.forgeWelcome.tilesearch": "Instructions : search then click for action.",
     "mtte.forgeWelcome.customsearch": "Instructions : (Bring Your Own Images). Put your images on the server in 'moulinette/images/custom', press 'Index images' button. Enjoy the search and Moulinette's capabilities!",
+    "mtte.forgeWelcome.customaudio": "Instructions : (Bring Your Own Sounds). Put your sounds/music on the server in 'moulinette/sounds/custom', press 'Index sounds' button. Enjoy the search and Moulinette's capabilities!",
     
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
@@ -115,7 +116,6 @@
     
     "mtte.customSearch": "BYOI",
     "mtte.customSearchDescr": "Search provided by Moulinette. Images provided by GM/admin.",
-    "mtte.customSearchExample": "Looking for an example? Download",
     
     "mtte.createTile": "Create tile",
     "mtte.createTileToolTip": "Generates a tile and adds it to the current scene",
@@ -134,8 +134,8 @@
     "mtte.indexImages": "Index images",
     "mtte.indexImagesToolTip": "Moulinette will scan the custom folder and index all found images. You must re-index everytime the folder changes.",
     
-    "mtte.indexingInProgress": "Moulinette is indexing your images... please wait",
-    "mtte.indexingDone": "Images successfully indexed!",
+    "mtte.indexingInProgress": "Moulinette is indexing your assets... please wait",
+    "mtte.indexingDone": "Assets successfully indexed!",
     
     "mtte.noResult": "No result found! Try with less terms or check your data.",
     
@@ -146,6 +146,11 @@
     "mtte.customReferencesPacks": "Packs available on Internet",
     "mtte.type": "Type",
     "mtte.typeFree": "Free",
+    
+    "mtte.customAudio": "Audio",
+    "mtte.customAudioDescr": "Search provided by Moulinette. Soundtracks provided by GM/admin.",
+    "mtte.indexSounds": "Index sounds",
+    "mtte.indexSoundsToolTip": "Moulinette will scan the custom folder and index all found sounds. You must re-index everytime the folder changes.",
     
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",

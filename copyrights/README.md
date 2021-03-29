@@ -21,6 +21,7 @@ Found and downloaded images are the intellectual property of their owners. Mouli
 ### Tiles
 
 * **Forgotten Adventures**: all available packs are provided under [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Moulinette gives appropriate credit and is then free to redistribute the material in any medium or format.
+* **Steelskin**: all available packs are provided under [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). Moulinette gives appropriate credit and is then free to redistribute the material in any medium or format. See also: [steelskin.jpg](steelskin.jpg)
 
 ## Moulinette Scribe
 

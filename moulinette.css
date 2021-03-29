@@ -55,6 +55,8 @@
 .mtte .list .pack {
   display:flex;
   align-items:center;
+  padding-left: 3px;
+  min-height: 22px;
 }
 
 .mtte .list .pack.alt {
@@ -73,6 +75,19 @@
 .mtte .gameicon {
   width: 450px;
   padding-left: 5px;
+}
+
+.mtte .audio {
+  width: 250px;
+}
+
+.mtte .audioSource {
+  width: 350px;
+}
+
+.mtte .sound-volume {
+  width: 100px;
+  margin-right: 10px;
 }
 
 .mtte .color {

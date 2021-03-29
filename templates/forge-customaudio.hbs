@@ -1,12 +1,12 @@
 <div class="main">
   <p>
-    <div class="description">{{localize "mtte.customSearchDescr"}}</div>
+    <div class="description">{{localize "mtte.customAudioDescr"}}</div>
     <div class="search">
-      <input id="searchTiles" class="searchinput" type="text" placeholder="{{localize "mtte.search"}}"></input>
+      <input id="searchAudio" class="searchinput" type="text" placeholder="{{localize "mtte.search"}}"></input>
       <button class="search"><i class="fas fa-search"></i></button>
       <select class="packlist">
       <option value="-1">{{localize "mtte.allPacks"}} ({{count}})</option>
-      {{#each packs as |p|}}<option value="{{p.id}}">{{p.publisher}} | {{p.name}}</option>{{/each}}
+      {{#each packs as |p|}}<option value="{{p.id}}">{{p.publisher}} | {{pretty p.name}}</option>{{/each}}
       </select>
     </div>
     <div id="assets" class="list">
@@ -14,7 +14,7 @@
   </p>
   <p>
     <div class="actions">
-      <button class="indexImages" title="{{localize "mtte.indexImagesToolTip"}}"><i class="fas fa-sync"></i> {{localize "mtte.indexImages"}}</button>
+      <button class="indexSounds" title="{{localize "mtte.indexSoundsToolTip"}}"><i class="fas fa-sync"></i> {{localize "mtte.indexSounds"}}</button>
       <button class="customReferences" title="{{localize "mtte.customReferencesToolTip"}}"><i class="fas fa-info-circle"></i> {{localize "mtte.customReferences"}}</button>
     </div>
   </p>

@@ -51,7 +51,8 @@ class MoulinetteClient {
 
 export class Moulinette {
   
-  static FOLDER_CUSTOM = "/moulinette/images/custom"
+  static FOLDER_CUSTOM_IMAGES = "/moulinette/images/custom"
+  static FOLDER_CUSTOM_SOUNDS = "/moulinette/sounds/custom"
   static lastSelectedInitiative = 0
   static lastAuthor = ""
   
@@ -82,6 +83,29 @@ export class Moulinette {
         source = "forgevtt";
     }
     return source;
+  }
+  
+  /**
+   * Converts filename into pretty text
+   */
+  static prettyText(text) {
+    // decode URI
+    text = decodeURIComponent(text)
+    
+    // replace file separators
+    text = text.replace(/[_-]/g, " ")
+    
+    // adds a space between word and number (ex: Orks2 => Orks 2)
+    text = text.replace( /(\d+)$/g, " $1");
+    
+    // capitalize each word
+    var splitStr = text.toLowerCase().split(' ');
+    for (var i = 0; i < splitStr.length; i++) {
+       splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    }
+    text = splitStr.join(' '); 
+    
+    return text;
   }
   
   /**
@@ -162,7 +186,7 @@ class MoulinetteHome extends FormApplication {
  *************************/
 class MoulinetteForge extends FormApplication {
   
-  static get TABS() { return ["scenes", "gameicons", "imagesearch", "tilesearch", "customsearch"] }
+  static get TABS() { return ["scenes", "gameicons", "imagesearch", "tilesearch", "customsearch", "customaudio"] }
   
   constructor() {
     super()
@@ -170,9 +194,9 @@ class MoulinetteForge extends FormApplication {
     this.tab = MoulinetteForge.TABS.includes(curTab) ? curTab : "scenes"
     
     // specific to Tiles
-    this.tiles = []
-    this.tilesPacks = []
-    this.tilesCount = 0
+    this.assets = []
+    this.assetsPacks = []
+    this.assetsCount = 0
   }
   
   static get defaultOptions() {
@@ -201,7 +225,8 @@ class MoulinetteForge extends FormApplication {
       gameIconsActive: this.tab == "gameicons", 
       imageSearchActive: this.tab == "imagesearch",
       tileSearchActive: this.tab == "tilesearch",
-      customSearchActive: this.tab == "customsearch"
+      customSearchActive: this.tab == "customsearch",
+      customAudioActive: this.tab == "customaudio"
     }
 
     if(this.tab == "scenes") {
@@ -227,10 +252,17 @@ class MoulinetteForge extends FormApplication {
     }
     else if(this.tab == "tilesearch" || this.tab == "customsearch") {
       const URL = this.tab == "tilesearch" ? MoulinetteClient.SERVER_URL + "/assets/data.json" : "moulinette/images/custom/index.json"
-      await this._buildTileIndex(URL)
-      let packs = this.tilesPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
+      await this._buildAssetIndex(URL)
+      let packs = this.assetsPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       data.packs = packs
-      data.count = this.tilesCount
+      data.count = this.assetsCount
+    }
+    else if(this.tab == "customaudio") {
+      const URL = "moulinette/sounds/custom/index.json"
+      await this._buildAssetIndex(URL)
+      let packs = this.assetsPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
+      data.packs = packs
+      data.count = this.assetsCount
     }
     
     return data
@@ -272,13 +304,13 @@ class MoulinetteForge extends FormApplication {
     // hide error/success message on anychange
     html.find(".check").click(this._hideMessagebox.bind(this));
     
-    // tile search (filter on pack)
+    // asset search (filter on pack)
     const parent = this
     html.find("select.packlist").on('change', function() {
       html.find(".searchinput").val("")
       parent.filter = ""
       parent.filterPack = this.value
-      parent._searchTiles()
+      parent._searchAssets()
     });
     
     // enable alt _alternateColors
@@ -337,9 +369,9 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
-  async _buildTileIndex(URL) {
+  async _buildAssetIndex(URL) {
     // build tiles' index
-    if(this.tiles.length == 0) {
+    if(this.assets.length == 0) {
       const response = await fetch(URL, {cache: "no-store"}).catch(function(e) {
         console.log(`Moulinette | Cannot download tiles/asset list`, e)
         return;
@@ -349,23 +381,23 @@ class MoulinetteForge extends FormApplication {
       let idx = 0;
       for(const pub of data) {
         for(const pack of pub.packs) {
-          this.tilesPacks.push({ publisher: pub.publisher, pubWebsite: pub.website, name: pack.name, url: pack.url, license: pack.license, licenseUrl: pack.licenseUrl, path: pack.path, count: pack.assets.length })
+          this.assetsPacks.push({ publisher: pub.publisher, pubWebsite: pub.website, name: pack.name, url: pack.url, license: pack.license, licenseUrl: pack.licenseUrl, path: pack.path, count: pack.assets.length })
           for(const asset of pack.assets) {
-            this.tiles.push({ pack: idx, filename: asset})
+            this.assets.push({ pack: idx, filename: asset})
           }
           idx++;
-          this.tilesCount += pack.assets.length
+          this.assetsCount += pack.assets.length
         }
       }
     }
   }
   
-  async _searchTiles() {
-    console.log("Moulinette | Searching tiles ... " + this.filter)
-    if(this.filter.length < 3 && this.filterPack < 0) return this.html.find("#tiles").html("")
+  async _searchAssets() {
+    console.log("Moulinette | Searching assets ... " + this.filter)
+    if(this.filter.length < 3 && this.filterPack < 0) return this.html.find("#assets").html("")
       
     const filters = this.filter.toLowerCase().split(" ")
-    const filtered = this.tiles.filter( t => {
+    const filtered = this.assets.filter( t => {
       // pack doesn't match selection
       if( this.filterPack >= 0 && t.pack != this.filterPack ) return false
       // check if text match
@@ -386,18 +418,35 @@ class MoulinetteForge extends FormApplication {
     filtered.forEach( r => {
       idx++
       const URL = (this.tab == "tilesearch" ? `${MoulinetteClient.SERVER_URL}/assets/` : "")
-      r.thumb = `${URL}${this.tilesPacks[r.pack].path}/${r.filename}`
-      html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.thumb}"/></div>` 
+      r.assetURL = `${URL}${this.assetsPacks[r.pack].path}${r.filename}`
+      if(this.tab == "tilesearch" || this.tab == "customsearch") {
+        html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.assetURL}"/></div>` 
+        
+        this.html.find("#assets").html(html)
+        this.html.find(".thumbres").click(this._onClickAction.bind(this))
+        // re-apply drag-drop
+        const el = this.html[0]
+        this._dragDrop.forEach(d => d.bind(el));
+        
+      } else if(this.tab == "customaudio") {
+        const pack = this.assetsPacks[r.pack]
+        const name = Moulinette.prettyText(r.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
+        html += `<div class="pack">` 
+        html += `<span class="audio">${name}</span><span class="audioSource">${pack.publisher} | ${pack.name}</span><div class="sound-controls flexrow">`
+        html += `<input class="sound-volume" type="range" title="Sound Volume" value="0.3968502629920499" min="0" max="1" step="0.05">`
+        //html += `<a class="sound-control inactive " data-action="sound-repeat" title="Loop Sound"><i class="fas fa-sync"></i></a>`
+        html += `<a class="sound-control" data-action="sound-play" title="Play Sound" data-idx="${idx}"><i class="fas fa-play"></i></a>`
+        html += "</div></div>"
+        
+        this.html.find("#assets").html(html)
+        this.html.find(".sound-control").click(this._onClickAction.bind(this))
+        this._alternateColors()
+      }
     })
     
-    this.html.find("#tiles").html(html)
-    this.html.find(".thumbres").click(this._onClickAction.bind(this))
-    // re-apply drag-drop
-    const el = this.html[0]
-    this._dragDrop.forEach(d => d.bind(el));
   }
   
-  _onClickAction(event) {
+  async _onClickAction(event) {
     event.preventDefault();
     const source = event.currentTarget;
     const idx = source.dataset.idx;
@@ -406,7 +455,25 @@ class MoulinetteForge extends FormApplication {
         new MoulinetteSearchResult(this.searchResults[idx-1]).render(true)
       } else if(this.tab == "tilesearch" || this.tab == "customsearch") {
         const result = this.searchResults[idx-1]
-        new MoulinetteTileResult(duplicate(result), duplicate(this.tilesPacks[result.pack]), this.tab).render(true)
+        new MoulinetteTileResult(duplicate(result), duplicate(this.assetsPacks[result.pack]), this.tab).render(true)
+      } else if(this.tab == "customaudio") {
+        const result = this.searchResults[idx-1]
+        // get playlist
+        let playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
+        console.log(playlist)
+        if(!playlist) {
+          playlist = await Playlist.create({name: "Moulinette"})
+        }
+        // get sound
+        let sound = playlist.sounds.find( s => s.path == result.assetURL )
+        if(!sound) {
+          const name = Moulinette.prettyText(result.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
+          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: result.assetURL}, {});
+        }
+        // toggle play
+        playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: true});
+        
+        console.log(playlist)
       }
     }
   }
@@ -419,7 +486,7 @@ class MoulinetteForge extends FormApplication {
       
       if(this.tab == "customsearch") {
         const tile = this.searchResults[idx-1]
-        const pack = this.tilesPacks[tile.pack]
+        const pack = this.assetsPacks[tile.pack]
         const filePath = `${pack.path}${tile.filename}`
   
         // Set drag data
@@ -432,7 +499,7 @@ class MoulinetteForge extends FormApplication {
       }
       else if(this.tab == "tilesearch") {
         const tile = this.searchResults[idx-1]
-        const pack = this.tilesPacks[tile.pack]
+        const pack = this.assetsPacks[tile.pack]
         const folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
         const imageName = tile.filename.split('/').pop()
         const filePath = `moulinette/tiles/${folderName}/${imageName}`
@@ -486,9 +553,9 @@ class MoulinetteForge extends FormApplication {
   
   _clearPackLists() {
     this.filter = ""
-    this.tilesCount = 0
-    this.tiles.length = 0
-    this.tilesPacks.length = 0
+    this.assetsCount = 0
+    this.assets.length = 0
+    this.assetsPacks.length = 0
   }
   
   _onNavigate(event) {
@@ -525,8 +592,8 @@ class MoulinetteForge extends FormApplication {
         this._searchGameIcons()
       } else if(this.tab == "imagesearch") {
         this._searchImages()
-      } else if(this.tab == "tilesearch" || this.tab == "customsearch") { 
-        this._searchTiles()
+      } else if(this.tab == "tilesearch" || this.tab == "customsearch" || this.tab == "customaudio") { 
+        this._searchAssets()
       }
     }
     else if (source.classList.contains("clear") || source.classList.contains("selectAll")) {
@@ -598,7 +665,7 @@ class MoulinetteForge extends FormApplication {
     }
     else if (source.classList.contains("listPacks")) {
       // sort
-      let list = duplicate(this.tilesPacks)
+      let list = duplicate(this.assetsPacks)
       list.sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       
       let html = `<table class="mttedialog listPacks"><tr><th>${game.i18n.localize("mtte.publisher")}</th><th>${game.i18n.localize("mtte.pack")}</th><th class="num">#</th><th>${game.i18n.localize("mtte.license")}</th></tr>`
@@ -614,7 +681,7 @@ class MoulinetteForge extends FormApplication {
       this.html.find(".indexImages").prop("disabled", true);
       // first level = publishers
       let publishers = []
-      let dir1 = await FilePicker.browse(Moulinette.getSource(), Moulinette.FOLDER_CUSTOM);
+      let dir1 = await FilePicker.browse(Moulinette.getSource(), Moulinette.FOLDER_CUSTOM_IMAGES);
       for(const pub of dir1.dirs) {
         let publisher = { publisher: decodeURI(pub.split('/').pop()), packs: [] }
         // second level = packs
@@ -627,7 +694,33 @@ class MoulinetteForge extends FormApplication {
         }
         publishers.push(publisher)
       }
-      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM, true)
+      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM_IMAGES, true)
+      ui.notifications.info(game.i18n.format("mtte.indexingDone"));
+      this._clearPackLists()
+      this.render();
+    }
+    
+    else if (source.classList.contains("indexSounds")) {
+      ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
+      this.html.find(".indexSounds").prop("disabled", true);
+      // first level = publishers
+      let publishers = []
+      let dir1 = await FilePicker.browse(Moulinette.getSource(), Moulinette.FOLDER_CUSTOM_SOUNDS);
+      for(const pub of dir1.dirs) {
+        let publisher = { publisher: decodeURI(pub.split('/').pop()), packs: [] }
+        console.log(pub)
+        // second level = packs
+        let dir2 = await FilePicker.browse(Moulinette.getSource(), pub);
+        console.log(dir2)
+        for(const pack of dir2.dirs) {
+          let files = await MoulinetteForge._scanFolder(pack, ["mp3", "ogg"]);
+          // remove pack path from file path
+          files = files.map( (path) => { return path.substring(pack.length) } )
+          publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
+        }
+        publishers.push(publisher)
+      }
+      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/sounds", Moulinette.FOLDER_CUSTOM_SOUNDS, true)
       ui.notifications.info(game.i18n.format("mtte.indexingDone"));
       this._clearPackLists()
       this.render();
@@ -641,7 +734,9 @@ class MoulinetteForge extends FormApplication {
   static async _scanFolder(path, filter) {
     let list = []
     const base = await FilePicker.browse(Moulinette.getSource(), path);
+    console.log(base)
     let baseFiles = filter ? base.files.filter(f => filter.includes(f.split(".").pop().toLowerCase())) : base.files
+    console.log(baseFiles)
     list.push(...baseFiles)
     for(const d of base.dirs) {
       const files = await MoulinetteForge._scanFolder(d, filter)

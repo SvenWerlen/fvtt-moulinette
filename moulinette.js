@@ -24,8 +24,8 @@ Hooks.once("init", async function () {
   //const blob = null;
   //const reader = new zip.ZipReader(new zip.BlobReader(blob));
 
-  Handlebars.registerHelper('decode', function(text) {
-    return decodeURI(text)
+  Handlebars.registerHelper('pretty', function(text) {
+    return game.moulinette.Moulinette.prettyText(text)
   });
   
   game.moulinette = {
@@ -40,6 +40,7 @@ Hooks.once("init", async function () {
     "modules/fvtt-moulinette/templates/forge-imagesearch.hbs",
     "modules/fvtt-moulinette/templates/forge-tilesearch.hbs",
     "modules/fvtt-moulinette/templates/forge-customsearch.hbs",
+    "modules/fvtt-moulinette/templates/forge-customaudio.hbs",
   ];
 
   // Load the template parts
@@ -65,9 +66,11 @@ Hooks.once("ready", async function () {
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/transl");
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/images");
     await Moulinette.createFolderIfMissing("moulinette", "moulinette/tiles");
+    await Moulinette.createFolderIfMissing("moulinette", "moulinette/sounds");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/babele");
     await Moulinette.createFolderIfMissing("moulinette/transl", "moulinette/transl/core");
     await Moulinette.createFolderIfMissing("moulinette/images", "moulinette/images/custom");
+    await Moulinette.createFolderIfMissing("moulinette/sounds", "moulinette/sounds/custom");
     
     // open moulinette on CTRL+M
     document.addEventListener("keydown", evt => {
