@@ -134,6 +134,15 @@
     "mtte.indexImages": "Index images",
     "mtte.indexImagesToolTip": "Moulinette will scan the custom folder and index all found images. You must re-index everytime the folder changes.",
     
+    "mtte.activatePlaylistTab": "Show playlist",
+    "mtte.activatePlaylistTabToolTip": "Activates the playlist tab",
+    
+    "mtte.deletePlaylist": "Delete playlist",
+    "mtte.deletePlaylistToolTip": "Deletes Moulinette playlist",
+    
+    "mtte.deletePlayListAction": "Delete Moulinette playlist",
+    "mtte.deletePlayListContent": "Are you sure you want to delete the playlist <em>Moulinette</em>?",
+    
     "mtte.indexingInProgress": "Moulinette is indexing your assets... please wait",
     "mtte.indexingDone": "Assets successfully indexed!",
     

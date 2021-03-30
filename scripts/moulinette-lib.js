@@ -719,7 +719,11 @@ class MoulinetteForge extends FormApplication {
       new Dialog({title: game.i18n.localize("mtte.listPacks"), content: html, buttons: {}}, { width: 650, height: "auto" }).render(true)
     }
     else if (source.classList.contains("customReferences")) {
-      new Dialog({title: game.i18n.localize("mtte.customReferencesPacks"), buttons: {}}, { id: "moulinette-info", classes: ["info"], template: "modules/fvtt-moulinette/templates/customReferences.hbs", width: 650, height: "auto" }).render(true)
+      if(this.tab == "customsearch") {
+        new Dialog({title: game.i18n.localize("mtte.customReferencesPacks"), buttons: {}}, { id: "moulinette-info", classes: ["info"], template: "modules/fvtt-moulinette/templates/customReferences.hbs", width: 650, height: "auto" }).render(true)
+      } else if(this.tab == "customaudio") {
+        new Dialog({title: game.i18n.localize("mtte.customReferencesPacks"), buttons: {}}, { id: "moulinette-info", classes: ["info"], template: "modules/fvtt-moulinette/templates/customReferencesAudio.hbs", width: 650, height: "auto" }).render(true)
+      }
     }
     else if (source.classList.contains("indexImages")) {
       ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
@@ -769,6 +773,37 @@ class MoulinetteForge extends FormApplication {
       ui.notifications.info(game.i18n.format("mtte.indexingDone"));
       this._clearPackLists()
       this.render();
+    }
+    
+    else if (source.classList.contains("activatePlaylist")) {
+      ui.playlists.activate()
+      // collapse all playlists but Moulinette
+      $("#playlists .directory-item").each( function() {
+        console.log(!$(this).hasClass("collapsed"), $(this).find(".playlist-name").text().trim() !== "Moulinette")
+        if(!$(this).hasClass("collapsed") && $(this).find(".playlist-name").text().trim() !== "Moulinette") {
+          $(this).find(".playlist-name").click()
+        }
+      })
+      // open Moulinette if collapsed
+      const playlist = $("#playlists .playlist-name").filter(function() { return $(this).text().trim() === "Moulinette" })
+      if(playlist) {
+        if($(playlist).closest(".directory-item").hasClass("collapsed")) {
+          $(playlist).click()
+        }
+      }
+    }
+    else if (source.classList.contains("deletePlaylist")) {
+      Dialog.confirm({
+        title: game.i18n.localize("mtte.deletePlayListAction"),
+        content: game.i18n.localize("mtte.deletePlayListContent"),
+        yes: () => { 
+          const moulinette = game.playlists.find( p => p.name == "Moulinette" )
+          if(moulinette) {
+            moulinette.delete()
+          }
+        },
+        no: () => {}
+      });
     }
   }
   
