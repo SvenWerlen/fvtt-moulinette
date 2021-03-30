@@ -81,7 +81,6 @@ Hooks.once("ready", async function () {
   }
 });
 
-
 // Render Sidebar
 Hooks.on("renderSidebarTab", (app, html) => {
   if (app instanceof Settings) {
@@ -104,4 +103,15 @@ Hooks.on("getSceneDirectoryEntryContext", (html, options) => {
       return true;
     },
   });
+});
+
+// Change Sound play status
+Hooks.on("preUpdatePlaylistSound", (parent, data, update) => {
+  if(Object.keys(update).includes("playing")) {
+    $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-play'] i`).attr("class", update.playing ? "fas fa-square" : "fas fa-play")
+  } else if(Object.keys(update).includes("volume")) {
+    $(`#assets .pack[data-path='${data.path}'] input.sound-volume`).val(AudioHelper.volumeToInput(update.volume))
+  } else if(Object.keys(update).includes("repeat")) {
+    $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-repeat']`).attr("class", update.repeat ? "sound-control" : "sound-control inactive")
+  }
 });

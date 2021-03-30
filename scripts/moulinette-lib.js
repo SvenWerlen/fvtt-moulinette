@@ -412,6 +412,9 @@ class MoulinetteForge extends FormApplication {
       return
     }
     
+    // keep track of all sounds currently playing
+    const playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
+    
     let html = ""
     this.searchResults = filtered;
     let idx = 0;
@@ -429,16 +432,22 @@ class MoulinetteForge extends FormApplication {
         this._dragDrop.forEach(d => d.bind(el));
         
       } else if(this.tab == "customaudio") {
-        const pack = this.assetsPacks[r.pack]
-        const name = Moulinette.prettyText(r.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
-        html += `<div class="pack">` 
+        const pack   = this.assetsPacks[r.pack]
+        const sound  = playlist ? playlist.sounds.find(s => s.path == r.assetURL) : null
+        const name   = Moulinette.prettyText(r.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
+        const icon   = sound && sound.playing ? "fa-square" : "fa-play"
+        const repeat = sound && sound.repeat ? "" : "inactive"
+        const volume = sound ? sound.volume : 0.5
+        
+        html += `<div class="pack" data-path="${r.assetURL}" data-idx="${idx}">` 
         html += `<span class="audio">${name}</span><span class="audioSource">${pack.publisher} | ${pack.name}</span><div class="sound-controls flexrow">`
-        html += `<input class="sound-volume" type="range" title="Sound Volume" value="0.3968502629920499" min="0" max="1" step="0.05">`
-        //html += `<a class="sound-control inactive " data-action="sound-repeat" title="Loop Sound"><i class="fas fa-sync"></i></a>`
-        html += `<a class="sound-control" data-action="sound-play" title="Play Sound" data-idx="${idx}"><i class="fas fa-play"></i></a>`
+        html += `<input class="sound-volume" type="range" title="${game.i18n.format("PLAYLIST.SoundVolume")}" value="${volume}" min="0" max="1" step="0.05">`
+        html += `<a class="sound-control ${repeat}" data-action="sound-repeat" title="${game.i18n.format("PLAYLIST.SoundLoop")}"><i class="fas fa-sync"></i></a>`
+        html += `<a class="sound-control" data-action="sound-play" title="${game.i18n.format("PLAYLIST.SoundPlay")} / ${game.i18n.format("PLAYLIST.SoundStop")}"><i class="fas ${icon}"></i></a>`
         html += "</div></div>"
         
         this.html.find("#assets").html(html)
+        this.html.find('.sound-volume').change(event => this._onSoundVolume(event));
         this.html.find(".sound-control").click(this._onClickAction.bind(this))
         this._alternateColors()
       }
@@ -446,10 +455,39 @@ class MoulinetteForge extends FormApplication {
     
   }
   
+  /**
+   * Handle volume adjustments to sounds within a Playlist
+   * @param {Event} event   The initial change event
+   * @private
+   */
+  _onSoundVolume(event) {
+    event.preventDefault();
+    const slider = event.currentTarget;
+    const path = slider.closest(".pack").dataset.path;
+    
+    // retrieve sound in play list
+    const playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
+    if(!playlist) return;
+    const sound = playlist.sounds.find( s => s.path == path )
+    if(!sound) return
+
+    // Only push the update if the user is a GM
+    const volume = AudioHelper.inputToVolume(slider.value);
+    if (game.user.isGM) playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, volume: volume});
+
+    // Otherwise simply apply a local override
+    else {
+      let sound = playlist.audio[sound._id];
+      if (!sound.howl) return;
+      sound.howl.volume(volume, sound._id);
+    }
+  }
+  
   async _onClickAction(event) {
     event.preventDefault();
     const source = event.currentTarget;
-    const idx = source.dataset.idx;
+    const idx = this.tab != "customaudio" ? source.dataset.idx : source.closest(".pack").dataset.idx;
+
     if(this.searchResults && idx > 0 && idx <= this.searchResults.length) {
       if(this.tab == "imagesearch") {
         new MoulinetteSearchResult(this.searchResults[idx-1]).render(true)
@@ -460,7 +498,6 @@ class MoulinetteForge extends FormApplication {
         const result = this.searchResults[idx-1]
         // get playlist
         let playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
-        console.log(playlist)
         if(!playlist) {
           playlist = await Playlist.create({name: "Moulinette"})
         }
@@ -468,12 +505,20 @@ class MoulinetteForge extends FormApplication {
         let sound = playlist.sounds.find( s => s.path == result.assetURL )
         if(!sound) {
           const name = Moulinette.prettyText(result.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
-          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: result.assetURL}, {});
+          const volume = AudioHelper.inputToVolume($(source.closest(".pack")).find(".sound-volume").val())
+          const repeat = $(source.closest(".pack")).find("a[data-action='sound-repeat']").hasClass('inactive')
+          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: result.assetURL, volume: volume}, {});
         }
         // toggle play
-        playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: true});
-        
-        console.log(playlist)
+        if(source.dataset.action == "sound-play") {
+          playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: !sound.playing});
+        } else if(source.dataset.action == "sound-repeat") {
+          if(sound) {
+            playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, repeat: !sound.repeat});
+          }
+        } else {
+          console.log(`Moulinette | Action ${source.dataset.action} not implemented`)
+        }
       }
     }
   }

@@ -90,9 +90,17 @@
   margin-right: 10px;
 }
 
+.mtte .sound-control {
+  margin-right: 10px;
+}
+
 .mtte .color {
   margin-left: 7px;
   width: 70px;
+}
+
+.mtte .sound-control.inactive {
+  color: #777;
 }
 
 .mtte .pack img {
