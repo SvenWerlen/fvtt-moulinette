@@ -412,7 +412,7 @@ class MoulinetteForge extends FormApplication {
       return
     }
     
-    // keep track of all sounds currently playing
+    // playlist
     const playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
     
     let html = ""
@@ -421,16 +421,9 @@ class MoulinetteForge extends FormApplication {
     filtered.forEach( r => {
       idx++
       const URL = (this.tab == "tilesearch" ? `${MoulinetteClient.SERVER_URL}/assets/` : "")
-      r.assetURL = `${URL}${this.assetsPacks[r.pack].path}${r.filename}`
+      r.assetURL = `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
       if(this.tab == "tilesearch" || this.tab == "customsearch") {
         html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.assetURL}"/></div>` 
-        
-        this.html.find("#assets").html(html)
-        this.html.find(".thumbres").click(this._onClickAction.bind(this))
-        // re-apply drag-drop
-        const el = this.html[0]
-        this._dragDrop.forEach(d => d.bind(el));
-        
       } else if(this.tab == "customaudio") {
         const pack   = this.assetsPacks[r.pack]
         const sound  = playlist ? playlist.sounds.find(s => s.path == r.assetURL) : null
@@ -445,14 +438,22 @@ class MoulinetteForge extends FormApplication {
         html += `<a class="sound-control ${repeat}" data-action="sound-repeat" title="${game.i18n.format("PLAYLIST.SoundLoop")}"><i class="fas fa-sync"></i></a>`
         html += `<a class="sound-control" data-action="sound-play" title="${game.i18n.format("PLAYLIST.SoundPlay")} / ${game.i18n.format("PLAYLIST.SoundStop")}"><i class="fas ${icon}"></i></a>`
         html += "</div></div>"
-        
-        this.html.find("#assets").html(html)
-        this.html.find('.sound-volume').change(event => this._onSoundVolume(event));
-        this.html.find(".sound-control").click(this._onClickAction.bind(this))
-        this._alternateColors()
       }
     })
     
+    // display results
+    if(this.tab == "tilesearch" || this.tab == "customsearch") {
+      this.html.find("#assets").html(html)
+      this.html.find(".thumbres").click(this._onClickAction.bind(this))
+      // re-apply drag-drop
+      const el = this.html[0]
+      this._dragDrop.forEach(d => d.bind(el));
+    } else if(this.tab == "customaudio") {
+      this.html.find("#assets").html(html)
+      this.html.find('.sound-volume').change(event => this._onSoundVolume(event));
+      this.html.find(".sound-control").click(this._onClickAction.bind(this))
+      this._alternateColors()
+    }
   }
   
   /**
@@ -1433,7 +1434,8 @@ class MoulinetteSearchResult extends FormApplication {
     // create article if requested
     if(event.submitter.className == "createArticle") {
       ui.journal.activate() // give focus to journal
-      await JournalEntry.create( {name: this.data.name, img: filepath} )
+      const article = await JournalEntry.create( {name: this.data.name, img: filepath} )
+      article.sheet.render(true)
     }
   }
 
