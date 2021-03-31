@@ -11,13 +11,6 @@
     "mtte.learnMore": "to learn more about Moulinette and/or support it.",
     "mtte.forge": "Forge!",
     
-    "mtte.forgeWelcome.scenes": "Instructions : check all scenes you want Moulinette to forge.",
-    "mtte.forgeWelcome.gameicons": "Instructions : search and check all icons you want Moulinette to forge.",
-    "mtte.forgeWelcome.imagesearch": "Instructions : search then click for action.",
-    "mtte.forgeWelcome.tilesearch": "Instructions : search then click for action.",
-    "mtte.forgeWelcome.customsearch": "Instructions : (Bring Your Own Images). Put your images on the server in 'moulinette/images/custom', press 'Index images' button. Enjoy the search and Moulinette's capabilities!",
-    "mtte.forgeWelcome.customaudio": "Instructions : (Bring Your Own Sounds). Put your sounds/music on the server in 'moulinette/sounds/custom', press 'Index sounds' button. Enjoy the search and Moulinette's capabilities!",
-    
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
     "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
@@ -105,10 +98,10 @@
     "mtte.backgroundColor": "Background color",
     "mtte.foregroundColor": "Foreground color",
     
-    "mtte.imageSearch": "Images",
+    "mtte.imageSearch": "Image search",
     "mtte.bingSearch": "Search provided by Microsoft Bing engine",
     
-    "mtte.tileSearch": "Tiles",
+    "mtte.tileSearch": "Tiles & images",
     "mtte.tileSearchDescr": "Search provided by Moulinette. Check available packs for copyrights.",
     "mtte.tileresult": "Tile result",
     "mtte.license": "License",
@@ -123,7 +116,7 @@
     "mtte.downloadImageSuccess": "Image successfully downloaded! Path copied into clipboard.",
     "mtte.clipboardImageSuccess": "Image path successfully copied into clipboard!",
     
-    "mtte.listAvailablePacks": "See available packs",
+    "mtte.listAvailablePacks": "Available packs",
     "mtte.listAvailablePacksToolTip": "Displays all available packs",
     "mtte.availablePacks": "Available tiles packs",
     "mtte.publisher": "Publisher",
@@ -148,11 +141,11 @@
     
     "mtte.noResult": "No result found! Try with less terms or check your data.",
     
-    "mtte.customReferences": "Looking for custom packs?",
+    "mtte.customReferences": "Additional packs?",
     "mtte.customReferencesToolTip": "Moulinette provides a list of references (ex: free tokens available to download).",
     
     "mtte.listPacks": "Available packs",
-    "mtte.customReferencesPacks": "Packs available on Internet",
+    "mtte.customReferencesPacks": "Packs available on Internet (you can download)",
     "mtte.type": "Type",
     "mtte.typeFree": "Free",
     
@@ -160,6 +153,9 @@
     "mtte.customAudioDescr": "Search provided by Moulinette. Soundtracks provided by GM/admin.",
     "mtte.indexSounds": "Index sounds",
     "mtte.indexSoundsToolTip": "Moulinette will scan the custom folder and index all found sounds. You must re-index everytime the folder changes.",
+    
+    "mtte.howto": "Help",
+    "mtte.howtoToolTip": "Howto: how does it work? How to install new images/tiles.",
     
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",

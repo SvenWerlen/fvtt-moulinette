@@ -215,12 +215,11 @@ class MoulinetteForge extends FormApplication {
   }
   
   async getData() {
-    const desc = game.i18n.localize("mtte.forgeWelcome." + this.tab)
     if (!game.user.isGM) {
-      return { desc: desc, error: game.i18n.localize("ERROR.mtteGMOnly") }
+      return { error: game.i18n.localize("ERROR.mtteGMOnly") }
     }
     
-    let data = { desc: desc, 
+    let data = { 
       scenesActive: this.tab == "scenes", 
       gameIconsActive: this.tab == "gameicons", 
       imageSearchActive: this.tab == "imagesearch",
@@ -243,7 +242,7 @@ class MoulinetteForge extends FormApplication {
         data.scCount = scCount
       } else {
         console.log(`Moulinette | Error during communication with server ${MoulinetteClient.SERVER_URL}`, lists)
-        return { desc: desc, error: game.i18n.localize("ERROR.mtteServerCommunication") }
+        return { error: game.i18n.localize("ERROR.mtteServerCommunication") }
       }
     }
     else if(this.tab == "gameicons") {
@@ -251,15 +250,13 @@ class MoulinetteForge extends FormApplication {
       data.bgColor = game.settings.get("moulinette", "gIconBgColor")
     }
     else if(this.tab == "tilesearch" || this.tab == "customsearch") {
-      const URL = this.tab == "tilesearch" ? MoulinetteClient.SERVER_URL + "/assets/data.json" : "moulinette/images/custom/index.json"
-      await this._buildAssetIndex(URL)
+      await this._buildAssetIndex([MoulinetteClient.SERVER_URL + "/assets/data.json", "moulinette/images/custom/index.json"])
       let packs = this.assetsPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       data.packs = packs
       data.count = this.assetsCount
     }
     else if(this.tab == "customaudio") {
-      const URL = "moulinette/sounds/custom/index.json"
-      await this._buildAssetIndex(URL)
+      await this._buildAssetIndex(["moulinette/sounds/custom/index.json"])
       let packs = this.assetsPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       data.packs = packs
       data.count = this.assetsCount
@@ -369,24 +366,26 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
-  async _buildAssetIndex(URL) {
+  async _buildAssetIndex(urlList) {
     // build tiles' index
     if(this.assets.length == 0) {
-      const response = await fetch(URL, {cache: "no-store"}).catch(function(e) {
-        console.log(`Moulinette | Cannot download tiles/asset list`, e)
-        return;
-      });
-      if(response.status != 200) return;
-      const data = await response.json();
       let idx = 0;
-      for(const pub of data) {
-        for(const pack of pub.packs) {
-          this.assetsPacks.push({ publisher: pub.publisher, pubWebsite: pub.website, name: pack.name, url: pack.url, license: pack.license, licenseUrl: pack.licenseUrl, path: pack.path, count: pack.assets.length })
-          for(const asset of pack.assets) {
-            this.assets.push({ pack: idx, filename: asset})
+      for(const URL of urlList) {
+        const response = await fetch(URL, {cache: "no-store"}).catch(function(e) {
+          console.log(`Moulinette | Cannot download tiles/asset list`, e)
+          return;
+        });
+        if(response.status != 200) return;
+        const data = await response.json();
+        for(const pub of data) {
+          for(const pack of pub.packs) {
+            this.assetsPacks.push({ publisher: pub.publisher, pubWebsite: pub.website, name: pack.name, url: pack.url, license: pack.license, licenseUrl: pack.licenseUrl, path: pack.path, count: pack.assets.length, isRemote: URL.startsWith('http') })
+            for(const asset of pack.assets) {
+              this.assets.push({ pack: idx, filename: asset})
+            }
+            idx++;
+            this.assetsCount += pack.assets.length
           }
-          idx++;
-          this.assetsCount += pack.assets.length
         }
       }
     }
@@ -420,7 +419,7 @@ class MoulinetteForge extends FormApplication {
     let idx = 0;
     filtered.forEach( r => {
       idx++
-      const URL = (this.tab == "tilesearch" ? `${MoulinetteClient.SERVER_URL}/assets/` : "")
+      const URL = this.assetsPacks[r.pack].isRemote ? `${MoulinetteClient.SERVER_URL}/assets/` : ""
       r.assetURL = `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
       if(this.tab == "tilesearch" || this.tab == "customsearch") {
         html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.assetURL}"/></div>` 
@@ -530,9 +529,9 @@ class MoulinetteForge extends FormApplication {
     const idx = div.dataset.idx;
     if(this.searchResults && idx > 0 && idx <= this.searchResults.length) { 
       
-      if(this.tab == "customsearch") {
-        const tile = this.searchResults[idx-1]
-        const pack = this.assetsPacks[tile.pack]
+      const tile = this.searchResults[idx-1]
+      const pack = this.assetsPacks[tile.pack]
+      if(!pack.isRemote) {
         const filePath = `${pack.path}${tile.filename}`
   
         // Set drag data
@@ -543,9 +542,7 @@ class MoulinetteForge extends FormApplication {
         };
         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
       }
-      else if(this.tab == "tilesearch") {
-        const tile = this.searchResults[idx-1]
-        const pack = this.assetsPacks[tile.pack]
+      else {
         const folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
         const imageName = tile.filename.split('/').pop()
         const filePath = `moulinette/tiles/${folderName}/${imageName}`
@@ -559,7 +556,7 @@ class MoulinetteForge extends FormApplication {
         event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
   
         // download & upload image
-        fetch(tile.thumb).catch(function(e) {
+        fetch(tile.assetURL).catch(function(e) {
           ui.notifications.error(game.i18n.format("ERROR.mtteDownload"));
           console.log(`Moulinette | Cannot download image ${imageName}`, e)
           return;
@@ -715,12 +712,18 @@ class MoulinetteForge extends FormApplication {
       list.sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       
       let html = `<table class="mttedialog listPacks"><tr><th>${game.i18n.localize("mtte.publisher")}</th><th>${game.i18n.localize("mtte.pack")}</th><th class="num">#</th><th>${game.i18n.localize("mtte.license")}</th></tr>`
-      list.forEach( t => html += `<tr><td><a href="${t.pubWebsite}" target="_blank">${t.publisher}</a></td><td><a href="${t.url}" target="_blank">${t.name}</a></td><td class="num">${t.count}</td><td><a href="${t.licenseUrl}" target="_blank">${t.license}</a></td></tr>`)
+      list.forEach( t => {
+        if(t.isRemote) {
+          html += `<tr><td><a href="${t.pubWebsite}" target="_blank">${t.publisher}</a></td><td><a href="${t.url}" target="_blank">${t.name}</a></td><td class="num">${t.count}</td><td><a href="${t.licenseUrl}" target="_blank">${t.license}</a></td></tr>`
+        } else {
+          html += `<tr><td>${t.publisher}</td><td>${t.name}</td><td class="num">${t.count}</td><td>${game.i18n.localize("mtte.unknownLicense")}</td></tr>`
+        }
+      })
       html += "</table>"
       new Dialog({title: game.i18n.localize("mtte.listPacks"), content: html, buttons: {}}, { width: 650, height: "auto" }).render(true)
     }
     else if (source.classList.contains("customReferences")) {
-      if(this.tab == "customsearch") {
+      if(this.tab == "tilesearch") {
         new Dialog({title: game.i18n.localize("mtte.customReferencesPacks"), buttons: {}}, { id: "moulinette-info", classes: ["info"], template: "modules/fvtt-moulinette/templates/customReferences.hbs", width: 650, height: "auto" }).render(true)
       } else if(this.tab == "customaudio") {
         new Dialog({title: game.i18n.localize("mtte.customReferencesPacks"), buttons: {}}, { id: "moulinette-info", classes: ["info"], template: "modules/fvtt-moulinette/templates/customReferencesAudio.hbs", width: 650, height: "auto" }).render(true)
@@ -749,7 +752,6 @@ class MoulinetteForge extends FormApplication {
       this._clearPackLists()
       this.render();
     }
-    
     else if (source.classList.contains("indexSounds")) {
       ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
       this.html.find(".indexSounds").prop("disabled", true);
@@ -775,7 +777,6 @@ class MoulinetteForge extends FormApplication {
       this._clearPackLists()
       this.render();
     }
-    
     else if (source.classList.contains("activatePlaylist")) {
       ui.playlists.activate()
       // collapse all playlists but Moulinette
@@ -806,6 +807,9 @@ class MoulinetteForge extends FormApplication {
         no: () => {}
       });
     }
+    else if (source.classList.contains("howto")) {
+      new Dialog({title: game.i18n.localize("mtte.howto"), buttons: {}}, { id: "moulinette-help", classes: ["howto"], template: `modules/fvtt-moulinette/templates/help-${this.tab}.hbs`, width: 650, height: 700, resizable: true }).render(true)
+    }
   }
   
   
@@ -815,9 +819,7 @@ class MoulinetteForge extends FormApplication {
   static async _scanFolder(path, filter) {
     let list = []
     const base = await FilePicker.browse(Moulinette.getSource(), path);
-    console.log(base)
     let baseFiles = filter ? base.files.filter(f => filter.includes(f.split(".").pop().toLowerCase())) : base.files
-    console.log(baseFiles)
     list.push(...baseFiles)
     for(const d of base.dirs) {
       const files = await MoulinetteForge._scanFolder(d, filter)
@@ -1459,11 +1461,11 @@ class MoulinetteTileResult extends FormApplication {
     this.data = tile;
     this.data.pack = pack;
     
-    if(tab == "tilesearch") {
+    if(pack.isRemote) {
       this.imageName = this.data.filename.split('/').pop()
       this.folderName = `${pack.publisher} ${pack.name}`.replace(/[\W_]+/g,"-").toLowerCase()
       this.filePath = `moulinette/tiles/${this.folderName}/${this.imageName}`
-    } else if(tab == "customsearch") {
+    } else {
       this.filePath = `${pack.path}${tile.filename}`
     }
   }
@@ -1494,7 +1496,7 @@ class MoulinetteTileResult extends FormApplication {
     } else if(event.submitter.className == "download") {
       this._downloadFile();
     } else if(event.submitter.className == "clipboard") {
-      navigator.clipboard.writeText(this.data.thumb)
+      navigator.clipboard.writeText(this.data.assetURL)
       .catch(err => {
         console.warn("Moulinette | Not able to copy path into clipboard")
       });
@@ -1521,14 +1523,14 @@ class MoulinetteTileResult extends FormApplication {
     //event.dataTransfer.setDragImage(preview, w/2, h/2);
     event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
     
-    if(this.tab == "tilesearch") {
+    if(this.data.pack.isRemote) {
       this._downloadFile()
     }
   }
 
   async _downloadFile() {
     // download & upload image
-    const res = await fetch(this.data.thumb).catch(function(e) {
+    const res = await fetch(this.data.assetURL).catch(function(e) {
       ui.notifications.error(game.i18n.format("ERROR.mtteDownload"));
       console.log(`Moulinette | Cannot download image ${this.data.filename}`, e)
       return false;
@@ -1551,7 +1553,7 @@ class MoulinetteTileResult extends FormApplication {
     super.activateListeners(html);
     this.bringToTop()
     this.html = html
-    html.find(".thumb").css('background', `url(${this.data.thumb}) 50% 50% no-repeat`)
+    html.find(".thumb").css('background', `url(${this.data.assetURL}) 50% 50% no-repeat`)
   }
   
 }
