@@ -157,6 +157,10 @@
     "mtte.howto": "Help",
     "mtte.howtoToolTip": "Howto: how does it work? How to install new images/tiles.",
     
+    "mtte.name": "Name",
+    "mtte.playChecked": "Play selected",
+    "mtte.playCheckedToolTip": "Creates a new playlist with the selected sounds and plays them.",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",

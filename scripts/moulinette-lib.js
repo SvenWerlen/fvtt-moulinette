@@ -407,7 +407,7 @@ class MoulinetteForge extends FormApplication {
     })
     
     if(filtered.length == 0) {
-      ui.notifications.warn(game.i18n.format("mtte.noResult"));
+      ui.notifications.warn(game.i18n.localize("mtte.noResult"));
       return
     }
     
@@ -417,38 +417,51 @@ class MoulinetteForge extends FormApplication {
     let html = ""
     this.searchResults = filtered;
     let idx = 0;
-    filtered.forEach( r => {
-      idx++
-      const URL = this.assetsPacks[r.pack].isRemote ? `${MoulinetteClient.SERVER_URL}/assets/` : ""
-      r.assetURL = `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
-      if(this.tab == "tilesearch" || this.tab == "customsearch") {
-        html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.assetURL}"/></div>` 
-      } else if(this.tab == "customaudio") {
-        const pack   = this.assetsPacks[r.pack]
-        const sound  = playlist ? playlist.sounds.find(s => s.path == r.assetURL) : null
-        const name   = Moulinette.prettyText(r.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
-        const icon   = sound && sound.playing ? "fa-square" : "fa-play"
-        const repeat = sound && sound.repeat ? "" : "inactive"
-        const volume = sound ? sound.volume : 0.5
-        
-        html += `<div class="pack" data-path="${r.assetURL}" data-idx="${idx}">` 
-        html += `<span class="audio">${name}</span><span class="audioSource">${pack.publisher} | ${pack.name}</span><div class="sound-controls flexrow">`
-        html += `<input class="sound-volume" type="range" title="${game.i18n.format("PLAYLIST.SoundVolume")}" value="${volume}" min="0" max="1" step="0.05">`
-        html += `<a class="sound-control ${repeat}" data-action="sound-repeat" title="${game.i18n.format("PLAYLIST.SoundLoop")}"><i class="fas fa-sync"></i></a>`
-        html += `<a class="sound-control" data-action="sound-play" title="${game.i18n.format("PLAYLIST.SoundPlay")} / ${game.i18n.format("PLAYLIST.SoundStop")}"><i class="fas ${icon}"></i></a>`
-        html += "</div></div>"
-      }
-    })
     
-    // display results
     if(this.tab == "tilesearch" || this.tab == "customsearch") {
+      filtered.forEach( r => {
+        idx++
+        const URL = this.assetsPacks[r.pack].isRemote ? `${MoulinetteClient.SERVER_URL}/assets/` : ""
+        r.assetURL = `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
+        html += `<div class="thumbres draggable" title="${r.filename}" data-idx="${idx}"><img width="100" height="100" src="${r.assetURL}"/></div>` 
+      })
+      // display results
       this.html.find("#assets").html(html)
       this.html.find(".thumbres").click(this._onClickAction.bind(this))
       // re-apply drag-drop
       const el = this.html[0]
       this._dragDrop.forEach(d => d.bind(el));
-    } else if(this.tab == "customaudio") {
+    }
+    else if(this.tab == "customaudio") {
+      // header
+      html += `<div class="pack header">` 
+      html += `<input type="checkbox" class="check all" name="all" value="-1">`
+      html += `<span class="audio"><b>${game.i18n.localize("mtte.name")}</b></span><span class="audioSource"><b>${game.i18n.localize("mtte.publisher")} | ${game.i18n.localize("mtte.pack")}</b></span><div class="sound-controls flexrow">`
+      html += "</div></div>"
+      filtered.forEach( r => {
+        idx++
+        const URL = this.assetsPacks[r.pack].isRemote ? `${MoulinetteClient.SERVER_URL}/assets/` : ""
+        r.assetURL = `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
+        
+        const pack   = this.assetsPacks[r.pack]
+        const sound  = playlist ? playlist.sounds.find(s => s.path == r.assetURL) : null
+        const name   = Moulinette.prettyText(r.filename.replace("/","").replace(".ogg","").replace(".mp3","").replace(".wav",""))
+        const icon   = sound && sound.playing ? "fa-square" : "fa-play"
+        const repeat = sound && sound.repeat ? "" : "inactive"
+        const volume = sound ? sound.volume : 0.5
+        
+        html += `<div class="pack" data-path="${r.assetURL}" data-idx="${idx}">` 
+        html += `<input type="checkbox" class="check">`
+        html += `<span class="audio">${name}</span><span class="audioSource">${pack.publisher} | ${pack.name}</span><div class="sound-controls flexrow">`
+        html += `<input class="sound-volume" type="range" title="${game.i18n.localize("PLAYLIST.SoundVolume")}" value="${volume}" min="0" max="1" step="0.05">`
+        html += `<a class="sound-control ${repeat}" data-action="sound-repeat" title="${game.i18n.localize("PLAYLIST.SoundLoop")}"><i class="fas fa-sync"></i></a>`
+        html += `<a class="sound-control" data-action="sound-play" title="${game.i18n.localize("PLAYLIST.SoundPlay")} / ${game.i18n.localize("PLAYLIST.SoundStop")}"><i class="fas ${icon}"></i></a>`
+        html += "</div></div>"
+      })
+      // display results
       this.html.find("#assets").html(html)
+      const jqHTML = this.html
+      this.html.find('.check.all').change(event => jqHTML.find('.check:not(".all")').prop('checked', event.currentTarget.checked) );
       this.html.find('.sound-volume').change(event => this._onSoundVolume(event));
       this.html.find(".sound-control").click(this._onClickAction.bind(this))
       this._alternateColors()
@@ -497,14 +510,14 @@ class MoulinetteForge extends FormApplication {
       } else if(this.tab == "customaudio") {
         const result = this.searchResults[idx-1]
         // get playlist
-        let playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
+        let playlist = game.playlists.find( pl => pl.data.name == "Moulinette Soundboard" )
         if(!playlist) {
-          playlist = await Playlist.create({name: "Moulinette"})
+          playlist = await Playlist.create({name: "Moulinette Soundboard", mode: -1})
         }
         // get sound
         let sound = playlist.sounds.find( s => s.path == result.assetURL )
         if(!sound) {
-          const name = Moulinette.prettyText(result.filename.replace("/","").replace(".ogg","").replace(".mp3",""))
+          const name = Moulinette.prettyText(result.filename.replace("/","").replace(".ogg","").replace(".mp3","").replace(".wav",""))
           const volume = AudioHelper.inputToVolume($(source.closest(".pack")).find(".sound-volume").val())
           const repeat = $(source.closest(".pack")).find("a[data-action='sound-repeat']").hasClass('inactive')
           sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: result.assetURL, volume: volume}, {});
@@ -557,7 +570,7 @@ class MoulinetteForge extends FormApplication {
   
         // download & upload image
         fetch(tile.assetURL).catch(function(e) {
-          ui.notifications.error(game.i18n.format("ERROR.mtteDownload"));
+          ui.notifications.error(game.i18n.localize("ERROR.mtteDownload"));
           console.log(`Moulinette | Cannot download image ${imageName}`, e)
           return;
         }).then( res => {
@@ -730,7 +743,7 @@ class MoulinetteForge extends FormApplication {
       }
     }
     else if (source.classList.contains("indexImages")) {
-      ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
+      ui.notifications.info(game.i18n.localize("mtte.indexingInProgress"));
       this.html.find(".indexImages").prop("disabled", true);
       // first level = publishers
       let publishers = []
@@ -748,12 +761,12 @@ class MoulinetteForge extends FormApplication {
         publishers.push(publisher)
       }
       await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM_IMAGES, true)
-      ui.notifications.info(game.i18n.format("mtte.indexingDone"));
+      ui.notifications.info(game.i18n.localize("mtte.indexingDone"));
       this._clearPackLists()
       this.render();
     }
     else if (source.classList.contains("indexSounds")) {
-      ui.notifications.info(game.i18n.format("mtte.indexingInProgress"));
+      ui.notifications.info(game.i18n.localize("mtte.indexingInProgress"));
       this.html.find(".indexSounds").prop("disabled", true);
       // first level = publishers
       let publishers = []
@@ -765,7 +778,7 @@ class MoulinetteForge extends FormApplication {
         let dir2 = await FilePicker.browse(Moulinette.getSource(), pub);
         console.log(dir2)
         for(const pack of dir2.dirs) {
-          let files = await MoulinetteForge._scanFolder(pack, ["mp3", "ogg"]);
+          let files = await MoulinetteForge._scanFolder(pack, ["mp3", "ogg", "wav"]);
           // remove pack path from file path
           files = files.map( (path) => { return path.substring(pack.length) } )
           publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
@@ -773,7 +786,7 @@ class MoulinetteForge extends FormApplication {
         publishers.push(publisher)
       }
       await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/sounds", Moulinette.FOLDER_CUSTOM_SOUNDS, true)
-      ui.notifications.info(game.i18n.format("mtte.indexingDone"));
+      ui.notifications.info(game.i18n.localize("mtte.indexingDone"));
       this._clearPackLists()
       this.render();
     }
@@ -781,18 +794,16 @@ class MoulinetteForge extends FormApplication {
       ui.playlists.activate()
       // collapse all playlists but Moulinette
       $("#playlists .directory-item").each( function() {
-        console.log(!$(this).hasClass("collapsed"), $(this).find(".playlist-name").text().trim() !== "Moulinette")
-        if(!$(this).hasClass("collapsed") && $(this).find(".playlist-name").text().trim() !== "Moulinette") {
+        if(!$(this).hasClass("collapsed") && !$(this).find(".playlist-name").text().trim().startsWith("Moulinette")) {
           $(this).find(".playlist-name").click()
         }
       })
       // open Moulinette if collapsed
-      const playlist = $("#playlists .playlist-name").filter(function() { return $(this).text().trim() === "Moulinette" })
-      if(playlist) {
-        if($(playlist).closest(".directory-item").hasClass("collapsed")) {
-          $(playlist).click()
+      $("#playlists .playlist-name").filter(function() { return $(this).text().trim().startsWith("Moulinette") }).each(function(index) { 
+        if($(this).closest(".directory-item").hasClass("collapsed")) {
+          $(this).click()
         }
-      }
+      })
     }
     else if (source.classList.contains("deletePlaylist")) {
       Dialog.confirm({
@@ -809,6 +820,25 @@ class MoulinetteForge extends FormApplication {
     }
     else if (source.classList.contains("howto")) {
       new Dialog({title: game.i18n.localize("mtte.howto"), buttons: {}}, { id: "moulinette-help", classes: ["howto"], template: `modules/fvtt-moulinette/templates/help-${this.tab}.hbs`, width: 650, height: 700, resizable: true }).render(true)
+    }
+    else if (source.classList.contains("playChecked")) {
+      // prepare selected sounds
+      let selected = []
+      let first = true
+      this.html.find(".check:checkbox:checked").each(function(index) { 
+        const path = $(this).closest(".pack").data('path')
+        const name = $(this).closest(".pack").find('.audio').text()
+        const volume = $(this).closest(".pack").find('.sound-volume').val()
+        if(path) { selected.push({name: name, path: path, volume: volume, playing: first}); first = false }
+      })
+      
+      // delete any existing playlist
+      let playlist = game.playlists.find( pl => pl.data.name == "Moulinette Playlist" )
+      if(playlist) { await playlist.delete() }
+      playlist = await Playlist.create({name: "Moulinette Playlist"})
+      
+      playlist.createEmbeddedEntity("PlaylistSound", selected)
+      playlist.update({ playing: true})
     }
   }
   
@@ -843,7 +873,7 @@ class MoulinetteForge extends FormApplication {
     } else if (selected.length > 3) {
       this._displayMessage(game.i18n.localize("ERROR.mtteTooMany"), 'error')
     } else if (this.inProgress) {
-      ui.notifications.error(game.i18n.format("ERROR.mtteInProgress"));
+      ui.notifications.error(game.i18n.localize("ERROR.mtteInProgress"));
     } else {
       this.inProgress = true
       let client = new MoulinetteClient()
@@ -1018,25 +1048,25 @@ class MoulinetteShare extends FormApplication {
   async _updateObject(event, inputs) {
     event.preventDefault();
     if(!inputs.sceneName || inputs.sceneName.length == 0) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteMandatorySceneName"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteMandatorySceneName"));
     }
     else if(!inputs.sceneDesc || inputs.sceneDesc.length == 0) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteMandatorySceneDesc"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteMandatorySceneDesc"));
     }
     else if(!inputs.authorImg || inputs.authorImg.length == 0) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteAuthorImg"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteAuthorImg"));
     }
     else if(!inputs.authorURL || inputs.authorURL.length == 0) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteAuthorURL"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteAuthorURL"));
     }
     else if(!inputs.imageURL || inputs.imageURL.length == 0) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteImageURL"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteImageURL"));
     }
     else if(!inputs.agree1 || !inputs.agree2) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteMustAgree"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteMustAgree"));
     }
     else if(!inputs.discordId || inputs.discordId.length == 0) {
-      return ui.notifications.error(game.i18n.format("ERROR.mtteDiscordId"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteDiscordId"));
     }
     
     // store settings
@@ -1061,9 +1091,9 @@ class MoulinetteShare extends FormApplication {
     })
     if(result.status != 200) {
       console.log("Moulinette | Sharing failed with error: " + result.data.error)
-      return ui.notifications.error(game.i18n.format("ERROR.mtteUnexpected"));
+      return ui.notifications.error(game.i18n.localize("ERROR.mtteUnexpected"));
     } else {
-      ui.notifications.info(game.i18n.format("mtte.shareSuccess"));
+      ui.notifications.info(game.i18n.localize("mtte.shareSuccess"));
       this.close()
       return;
     }
@@ -1274,7 +1304,7 @@ class MoulinetteScribe extends FormApplication {
         const pack = await response.json()
         
         if(r.type == "babele-translation" && (!"babele" in game.modules.keys() || !game.modules.get("babele").active)) {
-          ui.notifications.error(game.i18n.format("ERROR.mtteNoBabele"));
+          ui.notifications.error(game.i18n.localize("ERROR.mtteNoBabele"));
           continue;
         }
         
@@ -1418,7 +1448,7 @@ class MoulinetteSearchResult extends FormApplication {
     // download & upload image
     const headers = { method: "POST", headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({ url: this.data.url }) }
     const res = await fetch(MoulinetteClient.SERVER_URL + "/search/download", headers).catch(function(e) {
-      ui.notifications.error(game.i18n.format("ERROR.mtteDownloadTimeout"));
+      ui.notifications.error(game.i18n.localize("ERROR.mtteDownloadTimeout"));
       console.log(`Moulinette | Cannot download image ${svg}`, e)
       return;
     });
@@ -1491,8 +1521,8 @@ class MoulinetteTileResult extends FormApplication {
   _updateObject(event) {
     event.preventDefault();
     if(event.submitter.className == "createTile") {
-      ui.notifications.error(game.i18n.format("ERROR.mtteCreateTile"));
-      throw game.i18n.format("ERROR.mtteCreateTile");
+      ui.notifications.error(game.i18n.localize("ERROR.mtteCreateTile"));
+      throw game.i18n.localize("ERROR.mtteCreateTile");
     } else if(event.submitter.className == "download") {
       this._downloadFile();
     } else if(event.submitter.className == "clipboard") {
@@ -1500,7 +1530,7 @@ class MoulinetteTileResult extends FormApplication {
       .catch(err => {
         console.warn("Moulinette | Not able to copy path into clipboard")
       });
-      ui.notifications.info(game.i18n.format("mtte.clipboardImageSuccess"));
+      ui.notifications.info(game.i18n.localize("mtte.clipboardImageSuccess"));
     }
   }
   
@@ -1531,7 +1561,7 @@ class MoulinetteTileResult extends FormApplication {
   async _downloadFile() {
     // download & upload image
     const res = await fetch(this.data.assetURL).catch(function(e) {
-      ui.notifications.error(game.i18n.format("ERROR.mtteDownload"));
+      ui.notifications.error(game.i18n.localize("ERROR.mtteDownload"));
       console.log(`Moulinette | Cannot download image ${this.data.filename}`, e)
       return false;
     });
@@ -1545,7 +1575,7 @@ class MoulinetteTileResult extends FormApplication {
       console.warn("Moulinette | Not able to copy path into clipboard")
     });
     
-    ui.notifications.info(game.i18n.format("mtte.downloadImageSuccess"));
+    ui.notifications.info(game.i18n.localize("mtte.downloadImageSuccess"));
     return true
   }
 

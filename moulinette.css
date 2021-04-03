@@ -68,6 +68,11 @@
   color: #eee;
 }
 
+.mtte .list .pack.header {
+  background-color: #333;
+  color: #eee;
+}
+
 .mtte .scene, .mtte .transl { 
   width: 550px;
 }
@@ -82,7 +87,7 @@
 }
 
 .mtte .audioSource {
-  width: 350px;
+  width: 330px;
 }
 
 .mtte .sound-volume {
