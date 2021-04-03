@@ -8,10 +8,10 @@
 [Moulinette](https://github.com/SvenWerlen/moulinette) is a set of tools for importing packs of scenes, images, playlists prepared by the community.
 
 * [Moulinette Forge - Scenes](#forge): import scenes into your world. Share your scenes with the community.
-* [Moulinette Forge - Game icons](#forge-game): search and import game icons from <a href="https://game-icons.net/" target="_blank">game-icons.net</a>.
+* [Moulinette Forge - Icons](#forge-game): search and import game icons from <a href="https://game-icons.net/" target="_blank">game-icons.net</a>.
 * [Moulinette Forge - Image search](#forge-search): search images and generate articles.
-* [Moulinette Forge - Tiles](#forge-tiles): search tiles and drop them on your maps.
-* [Moulinette Forge - BYOI](#forge-byoi): bring your own images and let Moulinette manage them for you.
+* [Moulinette Forge - Tiles](#forge-tiles): search tiles and drop them on your maps. Bring your own images and let Moulinette manage them for you.
+* [Moulinette Forge - Audio](#forge-audio): Bring your own sounds and let Moulinette manage them for you. Search and play a sound on-the-fly or create a playlist.
 * [Moulinette Scribe](#scribe): install and apply translations.
 * [Install the module](#install): install the module on your Foundry VTT server.
 * [Support me on Patreon](#support)
@@ -24,8 +24,6 @@ You're a GM (game master) preparing a new scenario? Moulinette Forge lets you br
 * Check the scenes you want to import
 * Forge!
 
-![Catalog](docs/img/moulinette-forge.jpg)
-
 ![Catalog](docs/img/moulinette-forge2.jpg)
 
 You are a map designer and have prepared some scenes you'd like to share? Moulinette facilitates the process of sharing scenes with others.
@@ -36,6 +34,7 @@ You are a map designer and have prepared some scenes you'd like to share? Moulin
 * It will show up in the forge after the review process is completed!
 
 ![Catalog](docs/img/moulinette-forge3.jpg)
+<br>_(Scenes on the screenshot are from various creators who have given their permission.)_
 
 ## <a name="forge-game"/>Moulinette Forge - Game icons
 
@@ -46,6 +45,7 @@ You need icons for your game (actions, items, etc.).
 * Forge!
 
 ![Game icons](docs/img/moulinette-forge-game.jpg)
+<br>_(Icons on the screenshot are from [Game-icons.net](https://game-icons.net/) and are provided under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.)_
 
 ## <a name="forge-search"/>Moulinette Forge - Image search
 
@@ -56,6 +56,7 @@ You need images to enrich your game/campaign
 * Forge!
 
 ![Image search on Bing](docs/img/moulinette-forge-bing.jpg)
+<br>_(Images on the screenshot are from [Microsoft Bing](https://www.bing.com) search engine. Images are publicly available but their license varies.)_
 
 ## <a name="forge-tiles"/>Moulinette Forge - Tiles
 
@@ -66,8 +67,7 @@ You want to add tiles on your maps?
 * Voilà!
 
 ![Tiles](docs/img/moulinette-forge-tile.jpg)
-
-## <a name="forge-byoi"/>Moulinette Forge - Bring your own images (BYOI)
+<br>_(Tiles on the screenshot are from [Forgotten Adventures](https://www.forgotten-adventures.net/) which are license under [Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/))_
 
 You created or downloaded some tokens/assets you'd like Moulinette to manage for you?
 * Put them in `moulinette/images/custom` folder.
@@ -76,6 +76,20 @@ You created or downloaded some tokens/assets you'd like Moulinette to manage for
 * Moulinette provides you now the same features as for tiles (see above)
 
 ![Bring your own images](docs/img/moulinette-forge-byoi.jpg)
+<br>_(Tokens on the screenshot have been downloaded from [Devin's Token Site](https://immortalnights.com/tokens/token-packs/). 20 token packs have been made free to the public.)_
+
+## <a name="forge-tiles"/>Moulinette Forge - Audio
+
+You created or downloaded some sounds you'd like Moulinette to manage for you?
+* Put them in `moulinette/sounds/custom` folder.
+* Make sure to have at least a 2-depth structure (1. Publisher, 2. Pack, 3+ Sounds)
+* Index sounds
+* Moulinette lets you now search or browse sounds
+ * Play a sound *on-the-fly*
+ * Select sounds and create a playlist
+
+![Bring your own sounds](docs/img/moulinette-forge-audio.jpg)
+<br>_(Ambience sounds on the screenshot have been downloaded from [Tabletop Audio](https://tabletopaudio.com/) which are licensed under a [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International](https://creativecommons.org/licenses/by-nc-nd/4.0/) License.)_
 
 ## <a name="scribe"/>Moulinette Scribe
 
