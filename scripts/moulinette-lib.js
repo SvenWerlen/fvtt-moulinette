@@ -832,6 +832,8 @@ class MoulinetteForge extends FormApplication {
         if(path) { selected.push({name: name, path: path, volume: volume, playing: first}); first = false }
       })
       
+      if(selected.length == 0) return;
+      
       // delete any existing playlist
       let playlist = game.playlists.find( pl => pl.data.name == "Moulinette Playlist" )
       if(playlist) { await playlist.delete() }

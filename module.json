@@ -2,7 +2,7 @@
   "name": "fvtt-moulinette",
   "title": "Moulinette for FoundryVTT",
   "description": "Moulinette is a set of tools for importing packs of scenes, images, playlists prepared by the community.",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "author": "Sven Werlen",
   "esmodules": ["moulinette.js"],
   "styles": ["moulinette.css"],
@@ -22,7 +22,7 @@
     }
   ],
   "url": "https://github.com/SvenWerlen/fvtt-moulinette",
-  "download": "https://github.com/SvenWerlen/fvtt-moulinette/archive/v-0.13.0.zip",
+  "download": "https://github.com/SvenWerlen/fvtt-moulinette/archive/v-0.14.0.zip",
   "manifest": "https://raw.githubusercontent.com/SvenWerlen/fvtt-moulinette/master/module.json",
   "minimumCoreVersion": "0.7.6",
   "compatibleCoreVersion": "1.0.0"
