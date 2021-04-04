@@ -134,7 +134,7 @@
     "mtte.deletePlaylistToolTip": "Deletes Moulinette playlist",
     
     "mtte.deletePlayListAction": "Delete Moulinette playlist",
-    "mtte.deletePlayListContent": "Are you sure you want to delete the playlist <em>Moulinette</em>?",
+    "mtte.deletePlayListContent": "Are you sure you want to delete the playlist <em>Moulinette Soundboard</em>?",
     
     "mtte.indexingInProgress": "Moulinette is indexing your assets... please wait",
     "mtte.indexingDone": "Assets successfully indexed!",
@@ -161,6 +161,24 @@
     "mtte.playChecked": "Play selected",
     "mtte.playCheckedToolTip": "Creates a new playlist with the selected sounds and plays them.",
     
+    "mtte.favorite": "Create favorite",
+    "mtte.favoriteSound": "Add sound to favorites",
+    "mtte.favoriteDescr": "This action will store the selected sound as favorite. Choose a slot and specify a short text or icon to be rendered. Any existing favorite will be overriden.",
+    "mtte.shortText": "Short text",
+    "mtte.faIcon": "Icon from",
+    "mtte.localIcon": "Or browse icon",
+    "mtte.saveFavorite": "Save favorite",
+    "mtte.saveFavoriteToolTip": "Saves favorite into selected slot",
+    "mtte.browse": "Browse folders and select an icon",
+    "mtte.slotNotAssigned": "This slot has not been yet defined! Opening Forge Audio...",
+    "mtte.quickOpen": "Quick open",
+    "mtte.quickOpen": "Quick open",
+    "mtte.soundboard": "Soundboard",
+    "mtte.favoriteIconDescr": "You can choose to display a Font Awesome icon OR browse and choose your own icon. If you don't choose any icon, the short text will be displayed.",
+    
+    "mtte.moveFavorite": "Move favorite: do you want to overwrite?",
+    "mtte.moveFavoriteContent": "You are moving '{from}' to an occupied slot ({to}). Do you want to overwrite (<b>yes</b>) the destination or swap (<b>no</b>) positions?",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
@@ -183,6 +201,14 @@
     "ERROR.mtteDownload": "Image couldn't be downloaded from website. Try again later!",
     
     "ERROR.mtteCreateTile": "In order to create a tile, drag the image and drop it on the scene!",
+    "ERROR.mtteChooseSlot": "Choose a slot for the favorite",
+    "ERROR.mtteEnterShortText": "You must provide a short text",
+    "ERROR.mtteDoubleIconDefined": "You must EITHER choose a Font Awesome icon OR a local image but not both!",
+
+    "config.mtteSoundboardColumns": "Soundboard: shortcuts per row",
+    "config.mtteSoundboardColumnsHint": "Number of shortcuts rendered on one row on the soundboard",
+    "config.mtteSoundboardRows": "Soundboard: number of rows",
+    "config.mtteSoundboardRowsHint": "Number of rows on the soundboard",
     
     "mtte.END": ""
 }

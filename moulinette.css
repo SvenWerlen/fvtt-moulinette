@@ -87,7 +87,7 @@
 }
 
 .mtte .audioSource {
-  width: 330px;
+  width: 315px;
 }
 
 .mtte .sound-volume {
@@ -147,7 +147,7 @@
   display: inline;
 }
 
-.mtte .actions {
+.mtte .actions, .mtte .slots {
   display: flex;
 }
 
@@ -200,4 +200,75 @@
 
 .mttedialog.listPacks td.num, .mttedialog.listPacks th.num {
   text-align: right;
+}
+
+
+.moulinette-options {
+    /* margin: -46px 0 0 46px; */
+    box-sizing: content-box;
+    font-size: 18px;
+    line-height: 36px;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 10px #000;
+    color: #BBB;
+    border: 1px solid #000;
+    border-radius: 5px;
+    z-index: 30;
+}
+
+.moulinette-options ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.moulinette-options .lastcol {
+    border-right: none;
+}
+
+.moulinette-options .title {
+    width: 160px;
+    border-bottom: 1px solid #333;
+    text-align: left;
+}
+
+.moulinette-options li {
+    display: inline-block;
+    width: 48px;
+    text-align: center;
+    padding: 5px;
+    border-right: 1px solid #333;
+    border-top: 1px solid #333;
+    height: 48px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.moulinette-options li:hover {
+    color: #FFF;
+    border: 1px solid red;
+    border-bottom: 1px solid #ff6400;
+    box-shadow: 0 0 10px #ff6400;
+}
+
+.moulinette-options li i {
+    font-size: 24px;
+    vertical-align: middle;
+}
+
+.mtte button.selected {
+  font-weight: bold;
+  font-size: large;
+  border: 2px solid red;
+  border-bottom: 2px solid #ff6400;
+  box-shadow: 0 0 10px #ff6400;
+}
+
+.mtte button.slot {
+  overflow: hidden;
+}
+
+.mtte button img, .mtte button i {
+  vertical-align: middle;
 }

@@ -51,6 +51,8 @@ class MoulinetteClient {
 
 export class Moulinette {
   
+  static MOULINETTE_SOUNDBOARD = "Moulinette Soundboard"
+  static MOULINETTE_PLAYLIST = "Moulinette Playlist"
   static FOLDER_CUSTOM_IMAGES = "/moulinette/images/custom"
   static FOLDER_CUSTOM_SOUNDS = "/moulinette/sounds/custom"
   static lastSelectedInitiative = 0
@@ -75,6 +77,26 @@ export class Moulinette {
   
   static showMoulinetteScribe() {
     new MoulinetteScribe().render(true)
+  }
+  
+  /**
+   * Adds a control button in the menu (top-left)
+   */
+  static async addControls(controls, html) {
+
+      const moulinetteBtn = $(
+          `<li class="scene-control moulinette-scene-control" data-control="moulinette" title="${game.i18n.localize("mtte.moulinette")}">
+              <i class="fas fa-hammer"></i>
+              <ol class="control-tools">
+                  <div id="moulinetteOptions" class="moulinette-options" style="display: none;">
+                  </div>
+              </ol>
+          </li>`
+      );
+
+      html.append(moulinetteBtn);
+      moulinetteBtn[0].addEventListener('click', ev => this.toggleOptions(ev, html));
+      //  this._createDiceTable(html);
   }
   
   static getSource() {
@@ -137,6 +159,146 @@ export class Moulinette {
       console.log(e)
     }
   }
+  
+  static async toggleOptions(event, html) {
+    if (html.find('.moulinette-scene-control').hasClass('active')) {
+      html.find('#moulinetteOptions').hide();
+      html.find('.moulinette-scene-control').removeClass('active');
+      html.find('.scene-control').first().addClass('active');
+      $(document.getElementById("controls")).css('z-index', '');
+    } else {
+      this._createOptionsTable(html);
+      html.find('.scene-control').removeClass('active');
+      html.find('#moulinetteOptions').show();
+      html.find('.moulinette-scene-control').addClass('active');
+      $(document.getElementById("controls")).css('z-index', 159); // notifications have 160
+    }
+    event.stopPropagation();
+  }
+  
+  static async _createOptionsTable(html) {
+    const data = [
+      {id: "scenes", name: game.i18n.localize("mtte.scenes"), icon: "fa-image"},
+      {id: "gameicons", name: game.i18n.localize("mtte.gameIcons"), icon: "fa-file-image"},
+      {id: "imagesearch", name: game.i18n.localize("mtte.imageSearch"), icon: "fa-search"},
+      {id: "tilesearch", name: game.i18n.localize("mtte.tileSearch"), icon: "fa-puzzle-piece"},
+      {id: "customaudio", name: game.i18n.localize("mtte.customAudio"), icon: "fa-music"}
+    ]
+    
+    // audio favorites
+    let favorites = JSON.parse(game.settings.get("moulinette", "soundboard"))
+    
+    let content = `<ul><li class="title" data-type="home">${game.i18n.localize("mtte.quickOpen")}</li>`
+    for(const d of data) {
+      content += `<li data-type="${d.id}" class="quick" title="${d.name}"><i class="fas ${d.icon}"></i></li>`
+    }
+    content += "</ul>"
+    
+    const cols = game.settings.get("moulinette", "soundboardCols")
+    const rows = game.settings.get("moulinette", "soundboardRows")
+    for(let r=0; r<rows; r++) {
+      content += `<ul><li class="title" data-type="customaudio">${r == 0 ? game.i18n.localize("mtte.soundboard") : ""}</li>`
+      for(let c=0; c<cols; c++) {
+        const i = 1 + (r*cols) + c
+        let name = `${i}`
+        if(Object.keys(favorites).includes("fav" + i)) {
+          const fav = favorites["fav" + i]
+          if(fav.icon && fav.icon.length > 0) {
+            if(fav.faIcon) {
+              name = `<i class="fas fa-${fav.icon}" title="${fav.name}"></i>`
+            } else {
+              name = `<img class="icon" title="${fav.name}" src="${fav.icon}"/>`
+            }
+          } else {
+            name = fav.name
+          }
+        }
+        content += `<li class="fav" data-slot="${i}" draggable="true">${name}</li>`
+      }
+      content += "</ul>"
+    }
+    html.find('.moulinette-options ul').remove()
+    html.find('.moulinette-options').append(content)
+    html.find('.moulinette-options li.title').click(ev => this._openMoulinette(ev, html))
+    html.find('.moulinette-options li.quick').click(ev => this._openMoulinette(ev, html))
+    html.find('.moulinette-options li.fav').click(ev => this._playFavorite(ev, html))
+
+    html.find('.moulinette-options li.fav').on('dragstart',function (event) {
+      const slot = event.currentTarget.dataset.slot
+      event.originalEvent.dataTransfer.setData("text/plain", slot)
+    })
+
+    html.find('.moulinette-options li.fav').on('drop', async function (event) {
+      event.preventDefault();
+      const fromSlot = event.originalEvent.dataTransfer.getData("text/plain");
+      const toSlot = event.currentTarget.dataset.slot
+      let favorites = JSON.parse(game.settings.get("moulinette", "soundboard"))
+      if(fromSlot && toSlot && fromSlot != toSlot && Object.keys(favorites).includes("fav" + fromSlot)) {
+        const fromFav = favorites["fav" + fromSlot]
+        const toFav = Object.keys(favorites).includes("fav" + toSlot) ? favorites["fav" + toSlot] : null
+        let overwrite = null
+        // target not defined => move
+        if(!toFav) {
+          overwrite = true
+        }
+        // target defined => prompt for desired behaviour
+        else {
+          overwrite = await Dialog.confirm({
+            title: game.i18n.localize("mtte.moveFavorite"),
+            content: game.i18n.format("mtte.moveFavoriteContent", { from: fromFav.name, to: toFav.name}),
+          })
+        }
+        favorites["fav" + toSlot] = fromFav
+        if(overwrite) {
+          delete favorites["fav" + fromSlot]
+        } else {
+          favorites["fav" + fromSlot] = toFav
+        }
+        await game.settings.set("moulinette", "soundboard", JSON.stringify(favorites))
+        Moulinette._createOptionsTable($('#controls'))
+      }
+    })
+    
+    html.find('.moulinette-options li.fav').on('dragover',function (event) {
+      event.preventDefault();
+    })
+  }
+  
+  static async _openMoulinette(event, html) {
+    const type = event.currentTarget.dataset.type
+    if(type == "home") {
+      Moulinette.showMoulinette()
+    } else {
+      new MoulinetteForge(type).render(true)
+    }
+  }
+  
+  static async _playFavorite(event, html) {
+    const slot = event.currentTarget.dataset.slot
+    if(slot) {
+      let favorites = JSON.parse(game.settings.get("moulinette", "soundboard"))
+      if(Object.keys(favorites).includes("fav" + slot)) {
+        const fav = favorites["fav" + slot]
+        // get playlist
+        let playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_SOUNDBOARD )
+        if(!playlist) {
+          playlist = await Playlist.create({name: Moulinette.MOULINETTE_SOUNDBOARD, mode: -1})
+        }
+        // get sound
+        let sound = playlist.sounds.find( s => s.path == fav.path )
+        if(!sound) {
+          const name = fav.name
+          const repeat = false
+          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: fav.path, volume: fav.volume}, {});
+        }
+        playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: !sound.playing});
+      } else {
+        ui.notifications.warn(game.i18n.localize("mtte.slotNotAssigned"));
+        new MoulinetteForge("customaudio").render(true)
+        event.stopPropagation();
+      }
+    }
+  }
 };
 
 /*************************
@@ -188,9 +350,9 @@ class MoulinetteForge extends FormApplication {
   
   static get TABS() { return ["scenes", "gameicons", "imagesearch", "tilesearch", "customsearch", "customaudio"] }
   
-  constructor() {
+  constructor(tab) {
     super()
-    const curTab = game.settings.get("moulinette", "currentTab")
+    const curTab = tab ? tab : game.settings.get("moulinette", "currentTab")
     this.tab = MoulinetteForge.TABS.includes(curTab) ? curTab : "scenes"
     
     // specific to Tiles
@@ -412,7 +574,7 @@ class MoulinetteForge extends FormApplication {
     }
     
     // playlist
-    const playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
+    const playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_SOUNDBOARD )
     
     let html = ""
     this.searchResults = filtered;
@@ -456,6 +618,7 @@ class MoulinetteForge extends FormApplication {
         html += `<input class="sound-volume" type="range" title="${game.i18n.localize("PLAYLIST.SoundVolume")}" value="${volume}" min="0" max="1" step="0.05">`
         html += `<a class="sound-control ${repeat}" data-action="sound-repeat" title="${game.i18n.localize("PLAYLIST.SoundLoop")}"><i class="fas fa-sync"></i></a>`
         html += `<a class="sound-control" data-action="sound-play" title="${game.i18n.localize("PLAYLIST.SoundPlay")} / ${game.i18n.localize("PLAYLIST.SoundStop")}"><i class="fas ${icon}"></i></a>`
+        html += `<a class="sound-control" data-action="favorite" title="${game.i18n.localize("mtte.favoriteSound")}")}"><i class="far fa-bookmark"></i></a>`
         html += "</div></div>"
       })
       // display results
@@ -479,7 +642,7 @@ class MoulinetteForge extends FormApplication {
     const path = slider.closest(".pack").dataset.path;
     
     // retrieve sound in play list
-    const playlist = game.playlists.find( pl => pl.data.name == "Moulinette" )
+    const playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_SOUNDBOARD )
     if(!playlist) return;
     const sound = playlist.sounds.find( s => s.path == path )
     if(!sound) return
@@ -510,9 +673,9 @@ class MoulinetteForge extends FormApplication {
       } else if(this.tab == "customaudio") {
         const result = this.searchResults[idx-1]
         // get playlist
-        let playlist = game.playlists.find( pl => pl.data.name == "Moulinette Soundboard" )
+        let playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_SOUNDBOARD )
         if(!playlist) {
-          playlist = await Playlist.create({name: "Moulinette Soundboard", mode: -1})
+          playlist = await Playlist.create({name: Moulinette.MOULINETTE_SOUNDBOARD, mode: -1})
         }
         // get sound
         let sound = playlist.sounds.find( s => s.path == result.assetURL )
@@ -529,6 +692,8 @@ class MoulinetteForge extends FormApplication {
           if(sound) {
             playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, repeat: !sound.repeat});
           }
+        } else if(source.dataset.action == "favorite") {
+          new MoulinetteFavorite(sound).render(true)
         } else {
           console.log(`Moulinette | Action ${source.dataset.action} not implemented`)
         }
@@ -810,7 +975,7 @@ class MoulinetteForge extends FormApplication {
         title: game.i18n.localize("mtte.deletePlayListAction"),
         content: game.i18n.localize("mtte.deletePlayListContent"),
         yes: () => { 
-          const moulinette = game.playlists.find( p => p.name == "Moulinette" )
+          const moulinette = game.playlists.find( p => p.name == "Moulinette Soundboard" )
           if(moulinette) {
             moulinette.delete()
           }
@@ -835,9 +1000,9 @@ class MoulinetteForge extends FormApplication {
       if(selected.length == 0) return;
       
       // delete any existing playlist
-      let playlist = game.playlists.find( pl => pl.data.name == "Moulinette Playlist" )
+      let playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_PLAYLIST )
       if(playlist) { await playlist.delete() }
-      playlist = await Playlist.create({name: "Moulinette Playlist"})
+      playlist = await Playlist.create({name: Moulinette.MOULINETTE_PLAYLIST})
       
       playlist.createEmbeddedEntity("PlaylistSound", selected)
       playlist.update({ playing: true})
@@ -1586,6 +1751,127 @@ class MoulinetteTileResult extends FormApplication {
     this.bringToTop()
     this.html = html
     html.find(".thumb").css('background', `url(${this.data.assetURL}) 50% 50% no-repeat`)
+  }
+  
+}
+
+/*************************
+ * Moulinette Favorite
+ *************************/
+class MoulinetteFavorite extends FormApplication {
+  
+  static WIDTH = {10: 420, 15: 630, 20: 840}
+  
+  constructor(sound) {
+    super()
+    this.sound = sound;
+    
+  }
+  
+  static get defaultOptions() {
+    const cols = game.settings.get("moulinette", "soundboardCols")
+    return mergeObject(super.defaultOptions, {
+      id: "moulinette-favorite",
+      classes: ["mtte", "favorite"],
+      title: game.i18n.localize("mtte.favorite"),
+      template: "modules/fvtt-moulinette/templates/favorite.hbs",
+      width: MoulinetteFavorite.WIDTH[cols],
+      height: "auto",
+      closeOnSubmit: true,
+      submitOnClose: false,
+    });
+  }
+  
+  getData() {
+    let slots = []
+    let favorites = JSON.parse(game.settings.get("moulinette", "soundboard"))
+    const cols = game.settings.get("moulinette", "soundboardCols")
+    const rows = game.settings.get("moulinette", "soundboardRows")
+    for(let r=0; r<rows; r++) {
+      let list = []
+      for(let c=0; c<cols; c++) {
+        const i = 1 + (r*cols) + c
+        let data = { num: i, name: i }
+        if(Object.keys(favorites).includes("fav" + i)) {
+          const fav = favorites["fav" + i]
+          data["name"] = ""
+          if(fav.faIcon) {
+            data["faIcon"] = fav.icon
+          } else if(fav.icon) {
+            data["icon"] = fav.icon
+          } else {
+            data["name"] = fav.name
+          }
+        }
+        list.push(data)
+      }
+      slots.push(list)
+    }
+    return {slots: slots, sound: this.sound }
+  }
+  
+  async _onClick(event) {
+    const button = event.currentTarget;
+    if(button.classList.contains("cancel")) {
+      this.close()
+    }
+    else if(button.classList.contains("slot")) {
+      const idx = button.dataset.idx
+      this.html.find("button").removeClass("selected")
+      $(button).addClass("selected")
+      this.selected = idx;
+    }
+    else if(button.classList.contains("browse")) {
+      const icon = this.html.find("input.icon2").val()
+      new FilePicker({callback: this._onPathChosen.bind(this), current: icon ? icon : "moulinette/images/", type: "image"}).render(true);
+    }
+    else if(button.classList.contains("save")) {
+      const text = this.html.find("input.shortText").val()
+      const icon = this.html.find("input.icon").val()
+      const icon2 = this.html.find("input.icon2").val()
+      if(!this.selected) {
+        return ui.notifications.error(game.i18n.localize("ERROR.mtteChooseSlot"));
+      }
+      if(text.length == 0) {
+        return ui.notifications.error(game.i18n.localize("ERROR.mtteEnterShortText"));
+      }
+      if(icon.length > 0 && icon2.length > 0) {
+        return ui.notifications.error(game.i18n.localize("ERROR.mtteDoubleIconDefined"));
+      }
+      let favorites = JSON.parse(game.settings.get("moulinette", "soundboard"))
+      favorites["fav" + this.selected] = { name: text, icon: (icon.length > 0 ? icon : icon2), faIcon: icon.length > 0, path: this.sound.path, volume: this.sound.volume }
+      game.settings.set("moulinette", "soundboard", JSON.stringify(favorites))
+      // hide buttons
+      //if ($('.moulinette-scene-control').hasClass('active')) {
+      //  $('.moulinette-scene-control').click();
+      //} 
+      this.close()
+    }
+  }
+  
+  _onPathChosen(path) {
+    this.html.find("input.icon2").val(path)
+  }
+  
+  async _onTogglePreview(event) {
+    const sound = document.getElementById("previewSound")
+    if(sound.paused) {
+      sound.play();
+    }
+    else {
+      sound.pause();
+      sound.currentTime = 0;
+    }
+  }
+
+  activateListeners(html) {
+    this.html = html
+    //super.activateListeners(html);
+    //if (!$('.moulinette-scene-control').hasClass('active')) {
+    //  $('.moulinette-scene-control').click();
+    //} 
+    html.find("button").click(this._onClick.bind(this))
+    html.find("h2 a.sound-control i").click(this._onTogglePreview.bind(this))
   }
   
 }

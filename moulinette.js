@@ -16,6 +16,25 @@ Hooks.once("init", async function () {
   game.settings.register("moulinette", "gIconFgColor", { scope: "world", config: false, type: String, default: "#ffffff" })
   game.settings.register("moulinette", "gIconBgColor", { scope: "world", config: false, type: String, default: "#000000" })
   game.settings.register("moulinette", "currentTab", { scope: "world", config: false, type: String, default: "scenes" })
+  game.settings.register("moulinette", "soundboard", { scope: "world", config: false, type: String, default: "{}" })
+  game.settings.register("moulinette", "soundboardCols", {
+    name: game.i18n.localize("config.mtteSoundboardColumns"), 
+    hint: game.i18n.localize("config.mtteSoundboardColumnsHint"), 
+    scope: "world",
+    config: true,
+    default: 10,
+    type: Number,
+    choices: { 10: "10", 15: "15", 20: "20" }
+  });
+  game.settings.register("moulinette", "soundboardRows", {
+    name: game.i18n.localize("config.mtteSoundboardRows"), 
+    hint: game.i18n.localize("config.mtteSoundboardRowsHint"), 
+    scope: "world",
+    config: true,
+    default: 1,
+    type: Number,
+    choices: { 1: "1", 2: "2", 3: "3", 4: "4", 5: "5" }
+  });
   
   //const reader = new zip.HttpReader
   //const reader = new zip.ZipReader(new zip.HttpReader("https://www.patreon.com/file?h=27576090&i=3959878"))
@@ -115,3 +134,5 @@ Hooks.on("preUpdatePlaylistSound", (parent, data, update) => {
     $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-repeat']`).attr("class", update.repeat ? "sound-control" : "sound-control inactive")
   }
 });
+
+Hooks.on('renderSceneControls', (controls, html) => { Moulinette.addControls(controls, html); });
