@@ -4,10 +4,10 @@
     <i>{{localize "mtte.favoriteDescr"}}</i>
   </p>
   <p>  
-    <h2>{{sound.name}} <a class="sound-control" data-action="sound-play" title="{{localize "PLAYLIST.SoundPlay"}} / {{localize "PLAYLIST.SoundStop"}}"><i class="fas fa-play"></i></a></h2>
-    <audio id="previewSound" src="{{sound.path}}"></audio>
+    <h2>{{data.name}} <a class="sound-control" data-action="sound-play" title="{{localize "PLAYLIST.SoundPlay"}} / {{localize "PLAYLIST.SoundStop"}}"><i class="fas fa-play"></i></a></h2>
+    <audio id="previewSound" src="{{data.path}}"></audio>
   <p>  
-    <h3>Slot</h3>
+    <h3>Slot {{#if data.slot}}#{{data.slot}}{{/if}}</h3>
     {{#each slots as |row|}}
     <div class="slots">
       {{#each row as |s|}}
@@ -23,7 +23,7 @@
   <div class="form-group">
     <label>{{localize "mtte.shortText"}}</label>
     <div class="form-fields">              
-      <input class="shortText" type="text" name="shortText" placeholder="ex: door">
+      <input class="shortText" type="text" name="shortText" placeholder="ex: door" value="{{data.label}}">
     </div>
   </div>
   <p>  
@@ -32,13 +32,13 @@
   <div class="form-group">
     <label>{{localize "mtte.faIcon"}} <a href="https://fontawesome.com/icons?d=gallery&m=free" target="_blank">Font Awesome</a></label>
     <div class="form-fields">              
-      <input class="icon" type="text" name="icon" placeholder="ex: door-open">
+      <input class="icon" type="text" name="icon" placeholder="ex: door-open" value="{{data.icon}}">
     </div>
   </div>
   <div class="form-group">
     <label>{{localize "mtte.localIcon"}}</label>
     <div class="form-fields">              
-      <input class="icon2" type="text" name="icon2" placeholder="ex: moulinette/images/gameicons/swordman.svg">
+      <input class="icon2" type="text" name="icon2" placeholder="ex: moulinette/images/gameicons/swordman.svg" value="{{data.icon2}}">
       <button class="browse"><i class="fas fa-folder-open" title="{{localize "mtte.browse"}}"></i> </button>
     </div>
   </div>

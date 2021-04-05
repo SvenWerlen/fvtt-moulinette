@@ -267,6 +267,7 @@
 
 .mtte button.slot {
   overflow: hidden;
+  max-height: 34px;
 }
 
 .mtte button img, .mtte button i {

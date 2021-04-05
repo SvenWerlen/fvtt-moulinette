@@ -162,6 +162,7 @@
     "mtte.playCheckedToolTip": "Creates a new playlist with the selected sounds and plays them.",
     
     "mtte.favorite": "Create favorite",
+    "mtte.favoriteEdit": "Edit favorite",
     "mtte.favoriteSound": "Add sound to favorites",
     "mtte.favoriteDescr": "This action will store the selected sound as favorite. Choose a slot and specify a short text or icon to be rendered. Any existing favorite will be overriden.",
     "mtte.shortText": "Short text",
