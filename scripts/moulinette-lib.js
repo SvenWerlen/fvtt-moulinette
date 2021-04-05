@@ -194,8 +194,8 @@ export class Moulinette {
     }
     content += "</ul>"
     
-    const cols = game.settings.get("moulinette", "soundboardCols")
-    const rows = game.settings.get("moulinette", "soundboardRows")
+    const cols = game.settings.get("fvtt-moulinette", "soundboardCols")
+    const rows = game.settings.get("fvtt-moulinette", "soundboardRows")
     for(let r=0; r<rows; r++) {
       content += `<ul><li class="title" data-type="customaudio">${r == 0 ? game.i18n.localize("mtte.soundboard") : ""}</li>`
       for(let c=0; c<cols; c++) {
@@ -1803,7 +1803,7 @@ class MoulinetteFavorite extends FormApplication {
   }
   
   static get defaultOptions() {
-    const cols = game.settings.get("moulinette", "soundboardCols")
+    const cols = game.settings.get("fvtt-moulinette", "soundboardCols")
     return mergeObject(super.defaultOptions, {
       id: "moulinette-favorite",
       classes: ["mtte", "favorite"],
@@ -1821,8 +1821,8 @@ class MoulinetteFavorite extends FormApplication {
     // if slot is specified => edit mode
     if(!this.data.slot) {
       let favorites = game.settings.get("moulinette", "soundboard")
-      const cols = game.settings.get("moulinette", "soundboardCols")
-      const rows = game.settings.get("moulinette", "soundboardRows")
+      const cols = game.settings.get("fvtt-moulinette", "soundboardCols")
+      const rows = game.settings.get("fvtt-moulinette", "soundboardRows")
       for(let r=0; r<rows; r++) {
         let list = []
         for(let c=0; c<cols; c++) {

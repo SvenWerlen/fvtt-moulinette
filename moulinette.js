@@ -17,7 +17,7 @@ Hooks.once("init", async function () {
   game.settings.register("moulinette", "gIconBgColor", { scope: "world", config: false, type: String, default: "#000000" })
   game.settings.register("moulinette", "currentTab", { scope: "world", config: false, type: String, default: "scenes" })
   game.settings.register("moulinette", "soundboard", { scope: "world", config: false, type: Object, default: {} })
-  game.settings.register("moulinette", "soundboardCols", {
+  game.settings.register("fvtt-moulinette", "soundboardCols", {
     name: game.i18n.localize("config.mtteSoundboardColumns"), 
     hint: game.i18n.localize("config.mtteSoundboardColumnsHint"), 
     scope: "world",
@@ -26,7 +26,7 @@ Hooks.once("init", async function () {
     type: Number,
     choices: { 10: "10", 15: "15", 20: "20" }
   });
-  game.settings.register("moulinette", "soundboardRows", {
+  game.settings.register("fvtt-moulinette", "soundboardRows", {
     name: game.i18n.localize("config.mtteSoundboardRows"), 
     hint: game.i18n.localize("config.mtteSoundboardRowsHint"), 
     scope: "world",
