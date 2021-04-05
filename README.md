@@ -12,6 +12,7 @@
 * [Moulinette Forge - Image search](#forge-search): search images and generate articles.
 * [Moulinette Forge - Tiles](#forge-tiles): search tiles and drop them on your maps. Bring your own images and let Moulinette manage them for you.
 * [Moulinette Forge - Audio](#forge-audio): Bring your own sounds and let Moulinette manage them for you. Search and play a sound on-the-fly or create a playlist.
+* [Moulinette Forge - Soundboard](#forge-soundboard): Create your own soundboard. Prepare sounds for your games and play them very quickly and easily.
 * [Moulinette Scribe](#scribe): install and apply translations.
 * [Install the module](#install): install the module on your Foundry VTT server.
 * [Support me on Patreon](#support)
@@ -90,6 +91,17 @@ You created or downloaded some sounds you'd like Moulinette to manage for you?
 
 ![Bring your own sounds](docs/img/moulinette-forge-audio.jpg)
 <br>_(Ambience sounds on the screenshot have been downloaded from [Tabletop Audio](https://tabletopaudio.com/) which are licensed under a [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International](https://creativecommons.org/licenses/by-nc-nd/4.0/) License.)_
+
+## <a name="scribe"/>Moulinette Soundboard
+
+You can also create your own soundboard. 
+* Sounds can be added by clicking on the "favorite" icon (Moulinette Forge | Audio)
+* Moulinette adds a new control on the top left corner for opening the soundboard
+* Simply click on the sound to play it
+* Sounds can be modified or moved on the soundboard
+
+![Create your soundboard](docs/img/moulinette-forge-soundboard.jpg)
+<br>_(Icons on the screenshot are from [Game-icons.net](https://game-icons.net/) and are provided under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.)_
 
 ## <a name="scribe"/>Moulinette Scribe
 
