@@ -1,9 +1,10 @@
 # Moulinette for Foundry VTT
 
 [![GitHub tags (latest by date)](https://img.shields.io/github/v/tag/SvenWerlen/fvtt-moulinette)](https://github.com/SvenWerlen/fvtt-moulinette/releases)
-[![GitHub tags (latest by date)](https://img.shields.io/github/license/SvenWerlen/fvtt-moulinette)](https://github.com/SvenWerlen/fvtt-moulinette/LICENSE.txt)
-[![GitHub Download](https://img.shields.io/badge/foundryvtt-Download-green)](#install)
-[![Support me on Patreon](https://img.shields.io/badge/patreon-Support%20me-blue)](https://www.patreon.com/moulinette)
+[![License](https://img.shields.io/github/license/SvenWerlen/fvtt-moulinette)](https://github.com/SvenWerlen/fvtt-moulinette/LICENSE.txt)
+[![GitHub Download](https://img.shields.io/badge/foundryvtt-Download-important)](#install)
+![Tested on forge-vtt.com](https://img.shields.io/badge/Forge-supported-success)
+[![Support me on Patreon](https://img.shields.io/badge/patreon-Support%20me-informational)](https://www.patreon.com/moulinette)
 
 [Moulinette](https://github.com/SvenWerlen/moulinette) is a set of tools for importing packs of scenes, images, playlists prepared by the community.
 
