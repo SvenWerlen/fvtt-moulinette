@@ -942,7 +942,7 @@ class MoulinetteForge extends FormApplication {
         for(const pack of dir2.dirs) {
           let files = await MoulinetteForge._scanFolder(pack, ["gif","jpg","jpeg","png","webp"]);
           // remove pack path from file path
-          files = files.map( (path) => { return path.substring(pack.length) } )
+          files = files.map( (path) => { return path.split(pack)[1] } )
           publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
         }
         publishers.push(publisher)
@@ -967,7 +967,7 @@ class MoulinetteForge extends FormApplication {
         for(const pack of dir2.dirs) {
           let files = await MoulinetteForge._scanFolder(pack, ["mp3", "ogg", "wav"]);
           // remove pack path from file path
-          files = files.map( (path) => { return path.substring(pack.length) } )
+          files = files.map( (path) => { return path.split(pack)[1] } )
           publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
         }
         publishers.push(publisher)

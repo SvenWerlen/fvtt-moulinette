@@ -102,7 +102,7 @@ Hooks.once("ready", async function () {
 
 // Render Sidebar
 Hooks.on("renderSidebarTab", (app, html) => {
-  if (app instanceof Settings) {
+  if (game.user.isGM && app instanceof Settings) {
     // Add changelog button
     let button = $(`<button><i class="fas fa-hammer"></i> ${game.i18n.localize("mtte.moulinette")}</button>`);
     html.find("#game-details").append(button);
@@ -126,13 +126,19 @@ Hooks.on("getSceneDirectoryEntryContext", (html, options) => {
 
 // Change Sound play status
 Hooks.on("preUpdatePlaylistSound", (parent, data, update) => {
-  if(Object.keys(update).includes("playing")) {
-    $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-play'] i`).attr("class", update.playing ? "fas fa-square" : "fas fa-play")
-  } else if(Object.keys(update).includes("volume")) {
-    $(`#assets .pack[data-path='${data.path}'] input.sound-volume`).val(AudioHelper.volumeToInput(update.volume))
-  } else if(Object.keys(update).includes("repeat")) {
-    $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-repeat']`).attr("class", update.repeat ? "sound-control" : "sound-control inactive")
+  if (game.user.isGM) {
+    if(Object.keys(update).includes("playing")) {
+      $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-play'] i`).attr("class", update.playing ? "fas fa-square" : "fas fa-play")
+    } else if(Object.keys(update).includes("volume")) {
+      $(`#assets .pack[data-path='${data.path}'] input.sound-volume`).val(AudioHelper.volumeToInput(update.volume))
+    } else if(Object.keys(update).includes("repeat")) {
+      $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-repeat']`).attr("class", update.repeat ? "sound-control" : "sound-control inactive")
+    }
   }
 });
 
-Hooks.on('renderSceneControls', (controls, html) => { Moulinette.addControls(controls, html); });
+Hooks.on('renderSceneControls', (controls, html) => { 
+  if (game.user.isGM) { 
+    Moulinette.addControls(controls, html) 
+  } 
+});
