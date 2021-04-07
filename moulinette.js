@@ -125,14 +125,14 @@ Hooks.on("getSceneDirectoryEntryContext", (html, options) => {
 });
 
 // Change Sound play status
-Hooks.on("preUpdatePlaylistSound", (parent, data, update) => {
+Hooks.on("preUpdatePlaylistSound", (parent, update) => {
   if (game.user.isGM) {
     if(Object.keys(update).includes("playing")) {
-      $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-play'] i`).attr("class", update.playing ? "fas fa-square" : "fas fa-play")
+      $(`#assets .pack[data-path='${parent.data.path}'] a[data-action='sound-play'] i`).attr("class", update.playing ? "fas fa-square" : "fas fa-play")
     } else if(Object.keys(update).includes("volume")) {
-      $(`#assets .pack[data-path='${data.path}'] input.sound-volume`).val(AudioHelper.volumeToInput(update.volume))
+      $(`#assets .pack[data-path='${parent.data.path}'] input.sound-volume`).val(AudioHelper.volumeToInput(update.volume))
     } else if(Object.keys(update).includes("repeat")) {
-      $(`#assets .pack[data-path='${data.path}'] a[data-action='sound-repeat']`).attr("class", update.repeat ? "sound-control" : "sound-control inactive")
+      $(`#assets .pack[data-path='${parent.data.path}'] a[data-action='sound-repeat']`).attr("class", update.loop ? "sound-control" : "sound-control inactive")
     }
   }
 });

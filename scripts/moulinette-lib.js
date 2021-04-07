@@ -53,8 +53,8 @@ export class Moulinette {
   
   static MOULINETTE_SOUNDBOARD = "Moulinette Soundboard"
   static MOULINETTE_PLAYLIST = "Moulinette Playlist"
-  static FOLDER_CUSTOM_IMAGES = "/moulinette/images/custom"
-  static FOLDER_CUSTOM_SOUNDS = "/moulinette/sounds/custom"
+  static FOLDER_CUSTOM_IMAGES = "moulinette/images/custom"
+  static FOLDER_CUSTOM_SOUNDS = "moulinette/sounds/custom"
   static lastSelectedInitiative = 0
   static lastAuthor = ""
   
@@ -133,10 +133,11 @@ export class Moulinette {
   /**
    * Generates a new folder
    */
-  static async createFolderIfMissing(target, folderPath) {
-    let base = await FilePicker.browse(Moulinette.getSource(), folderPath);
-    if (base.target == target) {
-        await FilePicker.createDirectory(Moulinette.getSource(), folderPath);
+  static async createFolderIfMissing(parent, childPath) {
+    const parentFolder = await FilePicker.browse(Moulinette.getSource(), parent);
+    console.log(parent, childPath, parentFolder.dirs)
+    if (!parentFolder.dirs.includes(childPath)) {
+        await FilePicker.createDirectory(Moulinette.getSource(), childPath);
     }
   }
   
@@ -145,7 +146,7 @@ export class Moulinette {
    */
   static async upload(file, name, folderSrc, folderPath, overwrite = false) {
     const source = Moulinette.getSource()
-    Moulinette.createFolderIfMissing(folderSrc, folderPath)
+    await Moulinette.createFolderIfMissing(folderSrc, folderPath)
     
     // check if file already exist
     let base = await FilePicker.browse(source, folderPath);
@@ -311,9 +312,10 @@ export class Moulinette {
         if(!sound) {
           const name = fav.name
           const repeat = false
-          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: fav.path, volume: fav.volume}, {});
+          sound = await playlist.createEmbeddedDocuments("PlaylistSound", [{name: name, path: fav.path, volume: fav.volume}], {});
+          sound = sound[0]
         }
-        playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: !sound.playing});
+        playlist.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, playing: !sound.playing}]);
       } else {
         ui.notifications.warn(game.i18n.localize("mtte.slotNotAssigned"));
         new MoulinetteForge("customaudio").render(true)
@@ -671,13 +673,13 @@ class MoulinetteForge extends FormApplication {
 
     // Only push the update if the user is a GM
     const volume = AudioHelper.inputToVolume(slider.value);
-    if (game.user.isGM) playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, volume: volume});
+    if (game.user.isGM) playlist.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, volume: volume}]);
 
     // Otherwise simply apply a local override
     else {
-      let sound = playlist.audio[sound._id];
+      let sound = playlist.audio[sound.id];
       if (!sound.howl) return;
-      sound.howl.volume(volume, sound._id);
+      sound.howl.volume(volume, sound.id);
     }
   }
   
@@ -705,14 +707,16 @@ class MoulinetteForge extends FormApplication {
           const name = Moulinette.prettyText(result.filename.replace("/","").replace(".ogg","").replace(".mp3","").replace(".wav",""))
           const volume = AudioHelper.inputToVolume($(source.closest(".pack")).find(".sound-volume").val())
           const repeat = $(source.closest(".pack")).find("a[data-action='sound-repeat']").hasClass('inactive')
-          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: result.assetURL, volume: volume}, {});
+          sound = await playlist.createEmbeddedDocuments("PlaylistSound", [{name: name, path: result.assetURL, volume: volume}], {});
+          sound = sound[0]
         }
         // toggle play
         if(source.dataset.action == "sound-play") {
-          playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: !sound.playing});
+          playlist.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, playing: !sound.playing}]);
         } else if(source.dataset.action == "sound-repeat") {
+          console.log(sound)
           if(sound) {
-            playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, repeat: !sound.repeat});
+            playlist.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, repeat: !sound.repeat}]);
           }
         } else if(source.dataset.action == "favorite") {
           new MoulinetteFavorite({path: sound.path, name: sound.name, label: sound.name, volume: sound.volume }).render(true)
@@ -947,7 +951,7 @@ class MoulinetteForge extends FormApplication {
         }
         publishers.push(publisher)
       }
-      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM_IMAGES, true)
+      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "moulinette/images", Moulinette.FOLDER_CUSTOM_IMAGES, true)
       ui.notifications.info(game.i18n.localize("mtte.indexingDone"));
       this._clearPackLists()
       this.render();
@@ -972,7 +976,7 @@ class MoulinetteForge extends FormApplication {
         }
         publishers.push(publisher)
       }
-      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/sounds", Moulinette.FOLDER_CUSTOM_SOUNDS, true)
+      await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "moulinette/sounds", Moulinette.FOLDER_CUSTOM_SOUNDS, true)
       ui.notifications.info(game.i18n.localize("mtte.indexingDone"));
       this._clearPackLists()
       this.render();
@@ -1003,11 +1007,11 @@ class MoulinetteForge extends FormApplication {
             // stop any playing sound
             for( const sound of playlist.sounds ) {
               if(sound.playing) {
-                updates.push({_id: sound._id, playing: false})
+                updates.push({_id: sound.id, playing: false})
               }
             }
             if(updates.length > 0) {
-              await playlist.updateEmbeddedEntity("PlaylistSound", updates);
+              await playlist.updateEmbeddedDocuments("PlaylistSound", updates);
             }
             await playlist.delete()
           }
@@ -1036,7 +1040,7 @@ class MoulinetteForge extends FormApplication {
       if(playlist) { await playlist.delete() }
       playlist = await Playlist.create({name: Moulinette.MOULINETTE_PLAYLIST})
       
-      playlist.createEmbeddedEntity("PlaylistSound", selected)
+      playlist.createEmbeddedDocuments("PlaylistSound", [selected])
       playlist.update({ playing: true})
     }
   }
