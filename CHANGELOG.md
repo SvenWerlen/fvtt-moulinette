@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2021-04-07
+### Added
+- Soundboard : play a sound randomly from selected sounds
+
 ## [0.15.3] and [0.15.4] - 2021-04-05
 ### Fixed
 - Fix Moulinette (bring your own) for Forge (tentative)
@@ -17,11 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix setting/configuration name
 
 ## [0.15.0] - 2021-04-04
-### Add
+### Added
 - Soundboard (sound shortcuts/favorites)
 
 ## [0.14.0] - 2021-04-03
-### Add
+### Added
 - Create playlists based on selected sounds
 
 ## [0.13.0] - 2021-03-30
