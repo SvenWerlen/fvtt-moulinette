@@ -160,6 +160,9 @@
     "mtte.name": "Name",
     "mtte.playChecked": "Play selected",
     "mtte.playCheckedToolTip": "Creates a new playlist with the selected sounds and plays them.",
+    "mtte.favoriteChecked": "Selected to favorite",
+    "mtte.favoriteCheckedToolTip": "Creates a favorite which will play one of the selected sounds randomly.",
+    "mtte.favoriteMultiple": "Multiple sounds",
     
     "mtte.favorite": "Create favorite",
     "mtte.favoriteEdit": "Edit favorite",

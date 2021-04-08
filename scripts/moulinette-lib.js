@@ -306,12 +306,17 @@ export class Moulinette {
         if(!playlist) {
           playlist = await Playlist.create({name: Moulinette.MOULINETTE_SOUNDBOARD, mode: -1})
         }
+        let path = fav.path
+        if(Array.isArray(path)) {
+          const rand = Math.floor((Math.random() * path.length));
+          path = path[rand]
+        } 
         // get sound
-        let sound = playlist.sounds.find( s => s.path == fav.path )
+        let sound = playlist.sounds.find( s => s.path == path )
         if(!sound) {
           const name = fav.name
           const repeat = false
-          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: fav.path, volume: fav.volume}, {});
+          sound = await playlist.createEmbeddedEntity("PlaylistSound", {name: name, path: path, volume: fav.volume}, {});
         }
         playlist.updateEmbeddedEntity("PlaylistSound", {_id: sound._id, playing: !sound.playing});
       } else {
@@ -1018,26 +1023,35 @@ class MoulinetteForge extends FormApplication {
     else if (source.classList.contains("howto")) {
       new Dialog({title: game.i18n.localize("mtte.howto"), buttons: {}}, { id: "moulinette-help", classes: ["howto"], template: `modules/fvtt-moulinette/templates/help-${this.tab}.hbs`, width: 650, height: 700, resizable: true }).render(true)
     }
-    else if (source.classList.contains("playChecked")) {
+    else if (source.classList.contains("playChecked") || source.classList.contains("favoriteChecked")) {
       // prepare selected sounds
       let selected = []
-      let first = true
+      let isFirst = true
       this.html.find(".check:checkbox:checked").each(function(index) { 
         const path = $(this).closest(".pack").data('path')
         const name = $(this).closest(".pack").find('.audio').text()
         const volume = $(this).closest(".pack").find('.sound-volume').val()
-        if(path) { selected.push({name: name, path: path, volume: volume, playing: first}); first = false }
+        if(path) { selected.push({name: name, path: path, volume: volume, playing: isFirst}); isFirst = false }
       })
       
       if(selected.length == 0) return;
       
-      // delete any existing playlist
-      let playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_PLAYLIST )
-      if(playlist) { await playlist.delete() }
-      playlist = await Playlist.create({name: Moulinette.MOULINETTE_PLAYLIST})
-      
-      playlist.createEmbeddedEntity("PlaylistSound", selected)
-      playlist.update({ playing: true})
+      if (source.classList.contains("playChecked")) {
+        // delete any existing playlist
+        let playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_PLAYLIST )
+        if(playlist) { await playlist.delete() }
+        playlist = await Playlist.create({name: Moulinette.MOULINETTE_PLAYLIST})
+        
+        playlist.createEmbeddedEntity("PlaylistSound", selected)
+        playlist.update({ playing: true})
+      }
+      else if (source.classList.contains("favoriteChecked")) { 
+        const paths = selected.length == 1 ? selected[0].path : selected.map( (sound, idx) => sound.path )
+        const name = selected.length == 1 ? selected[0].name : game.i18n.localize("mtte.favoriteMultiple")
+        const volume = selected[0].volume
+        const label = selected[0].name
+        new MoulinetteFavorite({path: paths, name: name, label: label, volume: volume }).render(true)
+      }
     }
   }
   
@@ -1800,6 +1814,7 @@ class MoulinetteFavorite extends FormApplication {
     if(this.data.slot) {
       this.selected = this.data.slot
     }
+    
   }
   
   static get defaultOptions() {
@@ -1844,7 +1859,7 @@ class MoulinetteFavorite extends FormApplication {
         slots.push(list)
       }
     }
-    return {slots: slots, data: this.data}
+    return {slots: slots, data: this.data, multiple: Array.isArray(this.data.path)}
   }
   
   async _onClick(event) {
@@ -1888,7 +1903,22 @@ class MoulinetteFavorite extends FormApplication {
   }
   
   async _onTogglePreview(event) {
-    const sound = document.getElementById("previewSound")
+    let sound = null
+    if( Array.isArray(this.data.path) ) {
+      // pause sound if playing
+      if(this.currentlyPlaying && !this.currentlyPlaying.paused) {
+        this.currentlyPlaying.pause()
+        this.currentlyPlaying.currentTime = 0;
+        this.currentlyPlaying = null
+        return
+      }
+      const rand = Math.floor((Math.random() * this.data.path.length));
+      sound = document.getElementById("previewSound" + rand)
+      this.currentlyPlaying = sound
+    } else {
+      sound = document.getElementById("previewSound")
+    }
+    
     if(sound.paused) {
       sound.play();
     }

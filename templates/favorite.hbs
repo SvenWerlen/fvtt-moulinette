@@ -4,8 +4,16 @@
     <i>{{localize "mtte.favoriteDescr"}}</i>
   </p>
   <p>  
-    <h2>{{data.name}} <a class="sound-control" data-action="sound-play" title="{{localize "PLAYLIST.SoundPlay"}} / {{localize "PLAYLIST.SoundStop"}}"><i class="fas fa-play"></i></a></h2>
-    <audio id="previewSound" src="{{data.path}}"></audio>
+    {{#if multiple}}
+      <h2>{{localize "mtte.favoriteMultiple"}} <a class="sound-control" data-action="sound-play" title="{{localize "PLAYLIST.SoundPlay"}} / {{localize "PLAYLIST.SoundStop"}}"><i class="fas fa-play"></i></a></h2>
+      {{#each data.path as |p i|}}
+      <audio id="previewSound{{i}}" src="{{p}}"></audio>
+      {{/each}}
+    {{/if}}
+    {{#unless multiple}}
+      <h2>{{data.name}} <a class="sound-control" data-action="sound-play" title="{{localize "PLAYLIST.SoundPlay"}} / {{localize "PLAYLIST.SoundStop"}}"><i class="fas fa-play"></i></a></h2>
+      <audio id="previewSound" src="{{data.path}}"></audio>
+    {{/unless}}
   <p>  
     <h3>Slot {{#if data.slot}}#{{data.slot}}{{/if}}</h3>
     {{#each slots as |row|}}
