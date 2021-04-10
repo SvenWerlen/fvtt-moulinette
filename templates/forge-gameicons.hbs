@@ -1,22 +1,22 @@
 <div class="main">
   <p>
     <div class="description">{{localize "mtte.gameIcons"}} {{localize "mtte.currentlyAvailable"}}. {{localize "mtte.see"}} <a href="https://game-icons.net" target="_blank">game-icons.net</a>.</div>
-    <div class="search"><input id="searchGameIcons" class="searchinput" type="text" placeholder="{{localize "mtte.search"}}"></input><button class="search"><i class="fas fa-search"></i></button></div>
+    <div class="form-group search"><input id="searchGameIcons" class="searchinput" type="text" placeholder="{{localize "mtte.search"}}"></input><button type="submit" class="search"><i class="fas fa-search"></i></button></div>
     <div id="gameIcons" class="list">
     </div>
   </p>
-  <div class="options">
-    {{localize "mtte.foregroundColor"}} <input class="color" type="text" name="fgColor" maxlength="7" value="{{fgColor}}"> <input type="color" value="{{fgColor}}" data-edit="fgColor">
-    {{localize "mtte.backgroundColor"}} <input class="color" type="text" name="bgColor" maxlength="7" value="{{bgColor}}"> <input type="color" value="{{bgColor}}" data-edit="bgColor"> 
+  <div class="form-group options">
+    <span class="label">{{localize "mtte.foregroundColor"}}</span> <input class="color" type="text" name="fgColor" maxlength="7" value="{{fgColor}}"> <input type="color" value="{{fgColor}}" data-edit="fgColor">
+    <span class="label">{{localize "mtte.backgroundColor"}}</span> <input class="color" type="text" name="bgColor" maxlength="7" value="{{bgColor}}"> <input type="color" value="{{bgColor}}" data-edit="bgColor"> 
   </div>  
-  <p>
+  <footer>
     <div class="actions">
       <button class="clear" title="{{localize "mtte.clearActionToolTip"}}"><i class="far fa-square"></i> {{localize "mtte.clearAction"}}</button>
       <button class="selectAll" title="{{localize "mtte.selectAllActionToolTip"}}"><i class="far fa-check-square"></i> {{localize "mtte.selectAllAction"}}</button>
       <button class="install default" title="{{localize "mtte.forgeToolTip"}}"><i class="fas fa-hammer"></i> {{localize "mtte.forge"}}</button>
     </div>
   </p>
-  <p>
+  </footer>
     <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
   </p>
 </div>

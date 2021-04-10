@@ -60,7 +60,7 @@
 }
 
 .mtte .list .pack.alt {
-  background: rgba(180, 180, 180, 0.73);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .mtte .list .pack:hover {
@@ -87,7 +87,7 @@
 }
 
 .mtte .audioSource {
-  width: 315px;
+  width: 350px;
 }
 
 .mtte .sound-volume {
@@ -182,7 +182,7 @@
 }
 
 .mtte button.search {
-  width: 30px;
+  max-width: 30px;
   margin-left: 5px;
 }
 
@@ -272,4 +272,18 @@
 
 .mtte button img, .mtte button i {
   vertical-align: middle;
+}
+
+.mtte .specialSearch {
+  display: none;
+  font-style: italic;
+  color: darkred;
+}
+
+.mtte .options input[type="color"] {
+  max-width: 44px;
+}
+
+.mtte .options .label {
+  padding: 0px 3px;
 }

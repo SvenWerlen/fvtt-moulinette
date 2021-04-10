@@ -17,6 +17,7 @@
   <p>  
     <h3>Slot {{#if data.slot}}#{{data.slot}}{{/if}}</h3>
     {{#each slots as |row|}}
+    <footer>
     <div class="slots">
       {{#each row as |s|}}
         <button class="slot" data-idx="{{s.num}}">
@@ -26,6 +27,7 @@
         </button>
       {{/each}}
     </div>
+    </footer>
     {{/each}}
   </p>
   <div class="form-group">
@@ -47,13 +49,13 @@
     <label>{{localize "mtte.localIcon"}}</label>
     <div class="form-fields">              
       <input class="icon2" type="text" name="icon2" placeholder="ex: moulinette/images/gameicons/swordman.svg" value="{{data.icon2}}">
-      <button class="browse"><i class="fas fa-folder-open" title="{{localize "mtte.browse"}}"></i> </button>
+      <button type="submit" class="browse"><i class="fas fa-folder-open" title="{{localize "mtte.browse"}}"></i> </button>
     </div>
   </div>
-  <p>
+  <footer>
     <div class="actions">
       <button class="cancel"> {{localize "Cancel"}}</button>
       <button class="save" title="{{localize "mtte.saveFavoriteToolTip"}}"><i class="fas fa-save"></i> {{localize "mtte.saveFavorite"}}</button>
     </div>
-  </p>
+  </footer>
 </form>

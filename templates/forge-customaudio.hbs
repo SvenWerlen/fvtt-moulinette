@@ -1,9 +1,9 @@
 <div class="main">
   <p>
     <div class="description">{{localize "mtte.customAudioDescr"}}</div>
-    <div class="search">
+    <div class="form-group display-mode search">
       <input id="searchAudio" class="searchinput" type="text" placeholder="{{localize "mtte.search"}}"></input>
-      <button class="search"><i class="fas fa-search"></i></button>
+      <button type="submit" class="search"><i class="fas fa-search"></i></button>
       <select class="packlist">
       <option value="-1">{{localize "mtte.allPacks"}} ({{count}})</option>
       {{#each packs as |p|}}<option value="{{p.id}}">{{p.publisher}} | {{pretty p.name}}</option>{{/each}}
@@ -12,7 +12,7 @@
     <div id="assets" class="list">
     </div>
   </p>
-  <p>
+  <footer>
     <div class="actions">
       <button class="indexSounds" title="{{localize "mtte.indexSoundsToolTip"}}"><i class="fas fa-sync"></i> {{localize "mtte.indexSounds"}}</button>
       <button class="playChecked" title="{{localize "mtte.playCheckedToolTip"}}"><i class="fas fa-check-square"></i> {{localize "mtte.playChecked"}}</button>
@@ -22,8 +22,9 @@
     <div class="actions">
       <button class="activatePlaylist" title="{{localize "mtte.activatePlaylistTabToolTip"}}"><i class="fas fa-music"></i> {{localize "mtte.activatePlaylistTab"}}</button>
       <button class="deletePlaylist" title="{{localize "mtte.deletePlaylistToolTip"}}"><i class="fas fa-trash"></i> {{localize "mtte.deletePlaylist"}}</button>
+      <button class="howto" title="{{localize "mtte.howtoSoundsToolTip"}}"><i class="fas fa-question-circle"></i> {{localize "mtte.howto"}}</button>
     </div>
-  </p>
+  </footer>
   <p>
     <div class="messagebox"><i class="fas fa-check-circle"></i><span class="message"></span></div>
   </p>

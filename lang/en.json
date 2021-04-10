@@ -156,6 +156,7 @@
     
     "mtte.howto": "Help",
     "mtte.howtoToolTip": "Howto: how does it work? How to install new images/tiles.",
+    "mtte.howtoSoundsToolTip": "Howto: how does it work? How to install new sounds.",
     
     "mtte.name": "Name",
     "mtte.playChecked": "Play selected",
@@ -163,6 +164,8 @@
     "mtte.favoriteChecked": "Selected to favorite",
     "mtte.favoriteCheckedToolTip": "Creates a favorite which will play one of the selected sounds randomly.",
     "mtte.favoriteMultiple": "Multiple sounds",
+    "mtte.specialSearch": "This pack requires you to provide search terms",
+    "mtte.specialSearchFailed": "Something went wrong during the request/search",
     
     "mtte.favorite": "Create favorite",
     "mtte.favoriteEdit": "Edit favorite",

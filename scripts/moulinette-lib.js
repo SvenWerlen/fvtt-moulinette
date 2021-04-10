@@ -48,13 +48,36 @@ class MoulinetteClient {
   async delete(URI, data) { return this.send(URI, "DELETE") }
 }
 
+/**
+ * Client functions for communicating with BBC Sound Effects API
+ */
+class MoulinetteBBCClient {
+  
+  static API = "https://r9fanuyewg.execute-api.eu-west-1.amazonaws.com/prod/api/sfx/search"
+  static HEADERS = { 'Accept': 'application/json', 'Content-Type': 'application/json; charset=utf-8' }
+  
+  token = null
+  
+  /*
+   * Sends a etch to server and return the response
+   */
+  async search(query) {
+    
+    const content = {"criteria": { "from":0, "size":30, "query": query } }
+    const response = await fetch(MoulinetteBBCClient.API, { method:'POST', headers: MoulinetteBBCClient.HEADERS, body: JSON.stringify(content)}).catch(function(e) {
+      console.log(`Moulinette | Cannot establish connection to server ${MoulinetteBBCClient.API}`, e)
+    });
+    return { 'status': response.status, 'data': await response.json() }
+  }
+}
+
 
 export class Moulinette {
   
-  static MOULINETTE_SOUNDBOARD = "Moulinette Soundboard"
-  static MOULINETTE_PLAYLIST = "Moulinette Playlist"
-  static FOLDER_CUSTOM_IMAGES = "/moulinette/images/custom"
-  static FOLDER_CUSTOM_SOUNDS = "/moulinette/sounds/custom"
+  static MOULINETTE_SOUNDBOARD  = "Moulinette Soundboard"
+  static MOULINETTE_PLAYLIST    = "Moulinette Playlist"
+  static FOLDER_CUSTOM_IMAGES   = "/moulinette/images/custom"
+  static FOLDER_CUSTOM_SOUNDS   = "/moulinette/sounds/custom"
   static lastSelectedInitiative = 0
   static lastAuthor = ""
   
@@ -120,12 +143,14 @@ export class Moulinette {
     // adds a space between word and number (ex: Orks2 => Orks 2)
     text = text.replace( /(\d+)$/g, " $1");
     
-    // capitalize each word
-    var splitStr = text.toLowerCase().split(' ');
-    for (var i = 0; i < splitStr.length; i++) {
-       splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    // capitalize each word (ugly hack for BBC)
+    if(text.indexOf("BBC") < 0) {
+      var splitStr = text.toLowerCase().split(' ');
+      for (var i = 0; i < splitStr.length; i++) {
+        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+      }
+      text = splitStr.join(' ');
     }
-    text = splitStr.join(' '); 
     
     return text;
   }
@@ -394,7 +419,7 @@ class MoulinetteForge extends FormApplication {
       classes: ["mtte", "forge"],
       title: game.i18n.localize("mtte.moulinetteForge"),
       template: "modules/fvtt-moulinette/templates/forge.hbs",
-      width: 800,
+      width: 880,
       height: "auto",
       resizable: true,
       dragDrop: [{dragSelector: ".draggable"}],
@@ -445,8 +470,10 @@ class MoulinetteForge extends FormApplication {
       data.count = this.assetsCount
     }
     else if(this.tab == "customaudio") {
-      await this._buildAssetIndex(["moulinette/sounds/custom/index.json"])
-      let packs = this.assetsPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } ).sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
+      const special = [{ special: "bbc", publisher: "BBC", name: "Sounds Effects (bbc.co.uk – © copyright 2021 BBC)", pubWebsite: "https://www.bbc.co.uk", url: "https://sound-effects.bbcrewind.co.uk", "license": "check website", isRemote: true }]
+      await this._buildAssetIndex(["moulinette/sounds/custom/index.json"], special)
+      let packs = this.assetsPacks.map( (pack,idx) => { return { id: idx, name: pack.name, publisher: pack.publisher } } )
+      packs.sort((a, b) => (a.publisher == b.publisher) ? (a.name > b.name ? 1 : -1) : (a.publisher > b.publisher ? 1 : -1))
       data.packs = packs
       data.count = this.assetsCount
     }
@@ -555,7 +582,7 @@ class MoulinetteForge extends FormApplication {
     }
   }
   
-  async _buildAssetIndex(urlList) {
+  async _buildAssetIndex(urlList, special = null) {
     // build tiles' index
     if(this.assets.length == 0) {
       let idx = 0;
@@ -577,28 +604,59 @@ class MoulinetteForge extends FormApplication {
           }
         }
       }
+      if(special) {
+        for(const el of special) {
+          this.assetsPacks.push(el)
+        }
+      }
     }
   }
   
   async _searchAssets() {
     console.log("Moulinette | Searching assets ... " + this.filter)
     if(this.filter.length < 3 && this.filterPack < 0) return this.html.find("#assets").html("")
-      
-    const filters = this.filter.toLowerCase().split(" ")
-    const filtered = this.assets.filter( t => {
-      // pack doesn't match selection
-      if( this.filterPack >= 0 && t.pack != this.filterPack ) return false
-      // check if text match
-      for( const f of filters ) {
-        if( t.filename.toLowerCase().indexOf(f) < 0 ) return false
-      }
-      return true;
-    })
     
-    if(filtered.length == 0) {
-      ui.notifications.warn(game.i18n.localize("mtte.noResult"));
-      return
+    let filtered = []
+      
+    // BBC Search
+    if(this.filter.length >= 3 && this.filterPack >= 0 && this.assetsPacks[this.filterPack].special == "bbc") {
+      const client = new MoulinetteBBCClient()
+      const results = await client.search(this.filter)
+      if(results.status != 200) {
+        return ui.notifications.warn(game.i18n.localize("mtte.specialSearchFailed"));
+      }
+      // find BBC pack index (ugly implementation!!)
+      let packIdx = 0
+      for(let idx = 0; idx < this.assetsPacks.length; idx++) {
+        if(this.assetsPacks[idx].special == "bbc") {
+          packIdx = idx;
+          break
+        }
+      }
+      filtered = results.data.results.map((r) => { return { pack: packIdx, assetURL: `https://sound-effects-media.bbcrewind.co.uk/mp3/${r.id}.mp3`, filename: r.description}})
     }
+    // pack search
+    else {
+      const filters = this.filter.toLowerCase().split(" ")
+      filtered = this.assets.filter( t => {
+        // pack doesn't match selection
+        if( this.filterPack >= 0 && t.pack != this.filterPack ) return false
+        // check if text match
+        for( const f of filters ) {
+          if( t.filename.toLowerCase().indexOf(f) < 0 ) return false
+        }
+        return true;
+      })
+    }
+    
+    if(filtered.length == 0 && (this.filterPack < 0 || this.assetsPacks[this.filterPack].special != "bbc")) {
+      return ui.notifications.warn(game.i18n.localize("mtte.noResult"));
+    } else if(this.filter.length == 0 && this.filterPack >= 0 && this.assetsPacks[this.filterPack].special == "bbc") {
+      this.html.find("#assets").html(`<div class="specialSearch">${game.i18n.localize("mtte.specialSearch")}</div>`)
+      return this.html.find(".specialSearch").show()
+    }
+    
+    this.html.find(".specialSearch").hide()
     
     // playlist
     const playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_SOUNDBOARD )
@@ -630,9 +688,9 @@ class MoulinetteForge extends FormApplication {
       filtered.forEach( r => {
         idx++
         const URL = this.assetsPacks[r.pack].isRemote ? `${MoulinetteClient.SERVER_URL}/assets/` : ""
-        r.assetURL = `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
-        
         const pack   = this.assetsPacks[r.pack]
+        
+        r.assetURL = pack.special ? r.assetURL : `${URL}${this.assetsPacks[r.pack].path}/${r.filename}`
         const sound  = playlist ? playlist.sounds.find(s => s.path == r.assetURL) : null
         const name   = Moulinette.prettyText(r.filename.replace("/","").replace(".ogg","").replace(".mp3","").replace(".wav",""))
         const icon   = sound && sound.playing ? "fa-square" : "fa-play"
@@ -641,7 +699,12 @@ class MoulinetteForge extends FormApplication {
         
         html += `<div class="pack" data-path="${r.assetURL}" data-idx="${idx}">` 
         html += `<input type="checkbox" class="check">`
-        html += `<span class="audio">${name}</span><span class="audioSource">${pack.publisher} | ${pack.name}</span><div class="sound-controls flexrow">`
+        if(pack.special) {
+          const shortName = name.length <= 30 ? name : name.substring(0,30) + "..."
+          html += `<span class="audio" title="${name}">${shortName}</span><span class="audioSource"><a href="${pack.pubWebsite}" target="_blank">${pack.publisher}</a> | <a href="${pack.url}" target="_blank">${pack.name}</a></span><div class="sound-controls flexrow">`
+        } else {
+          html += `<span class="audio">${name}</span><span class="audioSource">${pack.publisher} | ${pack.name}</span><div class="sound-controls flexrow">`
+        }
         html += `<input class="sound-volume" type="range" title="${game.i18n.localize("PLAYLIST.SoundVolume")}" value="${volume}" min="0" max="1" step="0.05">`
         html += `<a class="sound-control ${repeat}" data-action="sound-repeat" title="${game.i18n.localize("PLAYLIST.SoundLoop")}"><i class="fas fa-sync"></i></a>`
         html += `<a class="sound-control" data-action="sound-play" title="${game.i18n.localize("PLAYLIST.SoundPlay")} / ${game.i18n.localize("PLAYLIST.SoundStop")}"><i class="fas ${icon}"></i></a>`
@@ -699,6 +762,7 @@ class MoulinetteForge extends FormApplication {
         new MoulinetteTileResult(duplicate(result), duplicate(this.assetsPacks[result.pack]), this.tab).render(true)
       } else if(this.tab == "customaudio") {
         const result = this.searchResults[idx-1]
+        console.log(result)
         // get playlist
         let playlist = game.playlists.find( pl => pl.data.name == Moulinette.MOULINETTE_SOUNDBOARD )
         if(!playlist) {

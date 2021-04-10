@@ -101,6 +101,7 @@ Hooks.once("ready", async function () {
 });
 
 // Render Sidebar
+/*
 Hooks.on("renderSidebarTab", (app, html) => {
   if (game.user.isGM && app instanceof Settings) {
     // Add changelog button
@@ -108,7 +109,7 @@ Hooks.on("renderSidebarTab", (app, html) => {
     html.find("#game-details").append(button);
     button.click(() => { game.moulinette.Moulinette.showMoulinette() });
   }
-});
+});*/
 
 Hooks.on("getSceneDirectoryEntryContext", (html, options) => {
   options.push({
