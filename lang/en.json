@@ -1,7 +1,7 @@
 {
     "mtte.moulinette": "Moulinette",
     "mtte.moulinetteHome": "Moulinette Home",
-    "mtte.homeWelcome": "Welcome! Moulinette gives you access to various items (scenes, translations) that you can easily forge/scribe without having to install separate modules.",
+    "mtte.homeWelcome": "Welcome! Moulinette gives you access to various items (scenes, images, icons, sounds, translations) that you can easily forge/scribe without having to install separate modules.",
     "mtte.readMore": "Learn more about Moulinette",
     "mtte.moulinetteForge": "Moulinette Forge",
     "mtte.moulinetteForgeHelp": "Forge creations of the community.",
@@ -10,10 +10,10 @@
     "mtte.seeDoc": "See documentation",
     "mtte.learnMore": "to learn more about Moulinette and/or support it.",
     "mtte.forge": "Forge!",
+    "mtte.forgeToolTip": "Forge the selected items",
     
     "mtte.preview": "See preview of the scene.",
     "mtte.clickToClose": "Click anywhere to close preview window",
-    "mtte.requestSuccessful": "Successfully sent. Please check the mine for crafted items!",
     
     "mtte.forgingItem": "Forging {pack} ... please wait!",
     "mtte.forgingItemMultiple": "Forging {pack} ({scene}) ... please wait!",
@@ -138,7 +138,7 @@
     "mtte.activatePlaylistTabToolTip": "Activates the playlist tab",
     
     "mtte.deletePlaylist": "Delete playlist",
-    "mtte.deletePlaylistToolTip": "Deletes Moulinette playlist",
+    "mtte.deletePlaylistToolTip": "Deletes \"Moulinette Soundboard\" playlist",
     
     "mtte.deletePlayListAction": "Delete Moulinette playlist",
     "mtte.deletePlayListContent": "Are you sure you want to delete the playlist <em>Moulinette Soundboard</em>?",
@@ -186,9 +186,9 @@
     "mtte.browse": "Browse folders and select an icon",
     "mtte.slotNotAssigned": "This slot has not been yet defined! Opening Forge Audio...",
     "mtte.quickOpen": "Quick open",
-    "mtte.quickOpen": "Quick open",
     "mtte.soundboard": "Soundboard",
     "mtte.favoriteIconDescr": "You can choose to display a Font Awesome icon OR browse and choose your own icon. If you don't choose any icon, the short text will be displayed.",
+    "mtte.slot": "Slot",
     
     "mtte.moveFavorite": "Move favorite: do you want to overwrite?",
     "mtte.moveFavoriteContent": "You are moving '{from}' to an occupied slot ({to}). Do you want to overwrite (<b>yes</b>) the destination or swap (<b>no</b>) positions?",

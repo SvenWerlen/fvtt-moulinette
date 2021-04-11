@@ -15,7 +15,7 @@
       <audio id="previewSound" src="{{data.path}}"></audio>
     {{/unless}}
   <p>  
-    <h3>Slot {{#if data.slot}}#{{data.slot}}{{/if}}</h3>
+    <h3>{{localize "mtte.slot"}} {{#if data.slot}}#{{data.slot}}{{/if}}</h3>
     {{#each slots as |row|}}
     <footer>
     <div class="slots">
