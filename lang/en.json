@@ -72,11 +72,18 @@
     "mtte.clipboardImage": "Clipboard",
     "mtte.clipboardImageToolTip": "Copy path into clipboard. You can then reuse elsewhere.",
     "mtte.searchBy": "Search provided by Microsoft Bing",
+    "mtte.searchByCustom": "Image was manually provided (from Clipboard)",
     "mtte.imageFrom": "Image from",
     "mtte.imageSize": "Image size",
     "mtte.createArticle": "Create article",
     "mtte.createArticleToolTip": "Generates an article based on the image",
     "mtte.searchresult": "Search result",
+    "mtte.enterImageURL": "Specify URL to image",
+    "mtte.enterImageURLDescription": "Moulinette has not been able to extract a valid image URL from your clipboard. Please specify below.",
+    "mtte.confirm": "Confirm",
+    "mtte.imageURL": "Image URL",
+    "mtte.fromClipboard": "From clipboard",
+    "mtte.pasteURL": "Import image from URL (and create article)",
     
     "mtte.updateAction": "Update installed",
     "mtte.updateActionToolTip": "Checks if there is any update for translations that you installed with Moulinette",
@@ -186,6 +193,8 @@
     "mtte.moveFavorite": "Move favorite: do you want to overwrite?",
     "mtte.moveFavoriteContent": "You are moving '{from}' to an occupied slot ({to}). Do you want to overwrite (<b>yes</b>) the destination or swap (<b>no</b>) positions?",
     
+    "mtte.unknown": "Unknown",
+    
     "ERROR.mtteGMOnly": "This interface is only for GMs.",
     "ERROR.mtteServerCommunication": "Communication with Moulinette server failed",
     "ERROR.mtteSelectAtLeastOne": "Please check at least one element!",
@@ -216,6 +225,8 @@
     "config.mtteSoundboardColumnsHint": "Number of shortcuts rendered on one row on the soundboard",
     "config.mtteSoundboardRows": "Soundboard: number of rows",
     "config.mtteSoundboardRowsHint": "Number of rows on the soundboard",
+    "config.mtteCustomPath": "Assets custom path",
+    "config.mtteCustomPathHint": "Specify a custom path (in addition to /moulinette) where moulinette must search for assets (during indexing)",
     
     "mtte.END": ""
 }

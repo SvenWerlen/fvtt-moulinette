@@ -1,3 +1,4 @@
 {"_id":"PIJm9kBH9bBkzY9W","name":"Open Moulinette Forge","type":"script","flags":{},"scope":"global","command":"game.moulinette.Moulinette.showMoulinetteForge()","img":"modules/fvtt-moulinette/img/moulinette-icon.png","actorIds":[]}
 {"_id":"XEYD1fGr6OqvvC8V","name":"Open Moulinette Scribe","type":"script","flags":{},"scope":"global","command":"game.moulinette.Moulinette.showMoulinetteScribe()","img":"modules/fvtt-moulinette/img/moulinette-config.png","actorIds":[]}
 {"_id":"oXz3LPK4hhUbbzoP","name":"Open Moulinette","type":"script","flags":{},"scope":"global","command":"game.moulinette.Moulinette.showMoulinette()","img":"modules/fvtt-moulinette/img/moulinette-icon.png","actorIds":[]}
+{"_id":"ruILOtRDXjzb1t3J","name":"Toggle Moulinette Controls","type":"script","flags":{},"scope":"global","command":"game.moulinette.Moulinette.toggleOptions(null, $('#controls'))","img":"modules/fvtt-moulinette/img/moulinette-icon-toggle.png","actorIds":[]}

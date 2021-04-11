@@ -198,7 +198,7 @@ export class Moulinette {
       html.find('.moulinette-scene-control').addClass('active');
       $(document.getElementById("controls")).css('z-index', 159); // notifications have 160
     }
-    event.stopPropagation();
+    if(event) event.stopPropagation();
   }
   
   static async _createOptionsTable(html) {
@@ -207,7 +207,13 @@ export class Moulinette {
       {id: "gameicons", name: game.i18n.localize("mtte.gameIcons"), icon: "fa-file-image"},
       {id: "imagesearch", name: game.i18n.localize("mtte.imageSearch"), icon: "fa-search"},
       {id: "tilesearch", name: game.i18n.localize("mtte.tileSearch"), icon: "fa-puzzle-piece"},
-      {id: "customaudio", name: game.i18n.localize("mtte.customAudio"), icon: "fa-music"}
+      {id: "customaudio", name: game.i18n.localize("mtte.customAudio"), icon: "fa-music"},
+      {},
+      {},
+      {},
+      {},
+      {id: "paste", name: game.i18n.localize("mtte.pasteURL"), icon: "fa-clipboard"}
+
     ]
     
     // audio favorites
@@ -215,7 +221,11 @@ export class Moulinette {
     
     let content = `<ul><li class="title" data-type="home">${game.i18n.localize("mtte.quickOpen")}</li>`
     for(const d of data) {
-      content += `<li data-type="${d.id}" class="quick" title="${d.name}"><i class="fas ${d.icon}"></i></li>`
+      if(d.id) {
+        content += `<li data-type="${d.id}" class="quick" title="${d.name}"><i class="fas ${d.icon}"></i></li>`
+      } else {
+        content += `<li class="quick" data-type="empty">&nbsp;</li>`
+      }
     }
     content += "</ul>"
     
@@ -293,9 +303,39 @@ export class Moulinette {
   
   static async _openMoulinette(event, html) {
     const type = event.currentTarget.dataset.type
-    if(type == "home") {
+    if(type == "empty") return event.stopPropagation();
+    else if(type == "home") {
       Moulinette.showMoulinette()
-    } else {
+    }
+    else if(type == "paste") {
+      let text = await navigator.clipboard.readText().catch(err => {
+        console.error('Failed to read clipboard contents: ', err);
+      });
+      const content = `<p>${game.i18n.localize("mtte.enterImageURLDescription")}</p>
+        <div class="form-group"><label><b>${game.i18n.localize("mtte.imageURL")}</b></label>
+        <label><input class="imageURL" type="text" name="imageURL" placeholder="https://..."></label></div><br/>`
+
+      if(!text || !text.startsWith("http")) {
+        text = await Dialog.prompt({
+          title: game.i18n.localize("mtte.enterImageURL"),
+          content: content,
+          label: game.i18n.localize("mtte.confirm"),
+          callback: html => {
+            return html.find(".imageURL").val()
+            }
+        });
+      }
+      const data = {
+        custom: true,
+        noSize: true,
+        name: game.i18n.localize("mtte.fromClipboard"),
+        page: text,
+        thumb: text,
+        url: text,
+      }
+      new MoulinetteSearchResult(data).render(true)
+    } 
+    else {
       new MoulinetteForge(type).render(true)
     }
   }
@@ -350,6 +390,90 @@ export class Moulinette {
         event.stopPropagation();
       }
     }
+  }
+  
+  static async scanAssets(sourcePath, extensions) {
+    // first level = publishers
+    let publishers = []
+    let dir1 = await FilePicker.browse(Moulinette.getSource(), sourcePath);
+    for(const pub of dir1.dirs) {
+      publishers.push({ publisher: decodeURI(pub.split('/').pop()), packs: await Moulinette.scanAssetsInPublisherFolder(pub, extensions) })
+    }
+    return publishers
+  }
+  
+  static async scanAssetsInPublisherFolder(sourcePath, extensions) {
+    let packs = []
+    // first level = packs
+    let dir = await FilePicker.browse(Moulinette.getSource(), sourcePath);
+    for(const pack of dir.dirs) {
+      packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: await Moulinette.scanAssetsInPackFolder(pack, extensions) })
+    }
+    return packs
+  }
+  
+  static async scanAssetsInPackFolder(packPath, extensions) {
+    const files = await MoulinetteForge._scanFolder(packPath, extensions)
+    return files.map( (path) => { return decodeURI(path).split(decodeURI(packPath))[1] } )
+  }
+  
+  static async scanAssetsInCustomFolders(sourcePath, extensions) {
+    let publishers = []
+    let cfgFiles = await MoulinetteForge._scanFolder(sourcePath, ".mtte");
+    for(const cfg of cfgFiles) {
+      // read ".json" file 
+      const response = await fetch(cfg + "?ms=" + Date.now(), {cache: "no-store"}).catch(function(e) {
+        console.log(`Moulinette | Cannot download tiles/asset list`, e)
+        return;
+      });
+      if(response.status != 200) return;
+      let data = {}
+      try {
+        data = await response.json();
+      } catch(e) {
+        console.warn(`${cfg} not processed.`, e);
+      }
+      const folder = cfg.substring(0, cfg.lastIndexOf("/") + 1);
+      // case #1 : folder is a publisher and subfolders represent packs for that publisher
+      if(data.publisher && data.publisher.length >= 3 && !data.pack) {
+        let packs = await Moulinette.scanAssetsInPublisherFolder(folder, extensions)
+        // remove empty packs
+        packs = packs.filter(p => p.assets.length > 0) 
+        if(packs.length > 0) {
+          const existingPublisher = publishers.find(p => p.publisher == data.publisher)
+          if(existingPublisher) {
+            existingPublisher.packs.push(...packs)
+          } else {
+            publishers.push({ publisher: data.publisher, packs: packs})
+          }
+        }
+      }
+      // case #2 : folder is a pack
+      else if(data.publisher && data.publisher.length >= 3 && data.pack && data.pack.length >= 3) {
+        const pack = { name: data.pack, path: folder, assets: await Moulinette.scanAssetsInPackFolder(folder, extensions) }
+        if(pack.assets.length > 0) {
+          const existingPublisher = publishers.find(p => p.publisher == data.publisher)
+          if(existingPublisher) {
+            existingPublisher.packs.push(pack)
+          } else {
+            publishers.push({ publisher: data.publisher, packs: [pack]})
+          }
+        }
+      }
+      // case #3 : invalid file or not enough information provided => consider all files
+      else {
+        const pack = { name: game.i18n.localize("mtte.unknown"), path: folder, assets: await Moulinette.scanAssetsInPackFolder(folder, extensions) }
+        if(pack.assets.length > 0) {
+          const existingPublisher = publishers.find(p => p.publisher == game.i18n.localize("mtte.unknown"))
+          if(existingPublisher) {
+            existingPublisher.packs.push(pack)
+          } else {
+            publishers.push({ publisher: game.i18n.localize("mtte.unknown"), packs: [pack]})
+          }
+        }
+      }
+    }
+    return publishers
   }
 };
 
@@ -1001,20 +1125,11 @@ class MoulinetteForge extends FormApplication {
     else if (source.classList.contains("indexImages")) {
       ui.notifications.info(game.i18n.localize("mtte.indexingInProgress"));
       this.html.find(".indexImages").prop("disabled", true);
-      // first level = publishers
-      let publishers = []
-      let dir1 = await FilePicker.browse(Moulinette.getSource(), Moulinette.FOLDER_CUSTOM_IMAGES);
-      for(const pub of dir1.dirs) {
-        let publisher = { publisher: decodeURI(pub.split('/').pop()), packs: [] }
-        // second level = packs
-        let dir2 = await FilePicker.browse(Moulinette.getSource(), pub);
-        for(const pack of dir2.dirs) {
-          let files = await MoulinetteForge._scanFolder(pack, ["gif","jpg","jpeg","png","webp"]);
-          // remove pack path from file path
-          files = files.map( (path) => { return decodeURI(path).split(decodeURI(pack))[1] } )
-          publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
-        }
-        publishers.push(publisher)
+      const EXT = ["gif","jpg","jpeg","png","webp","svg"]
+      let publishers = await Moulinette.scanAssets(Moulinette.FOLDER_CUSTOM_IMAGES, EXT)
+      const customPath = game.settings.get("fvtt-moulinette", "customPath")
+      if(customPath) {
+        publishers.push(...await Moulinette.scanAssetsInCustomFolders(customPath, EXT))
       }
       await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/images", Moulinette.FOLDER_CUSTOM_IMAGES, true)
       ui.notifications.info(game.i18n.localize("mtte.indexingDone"));
@@ -1024,22 +1139,11 @@ class MoulinetteForge extends FormApplication {
     else if (source.classList.contains("indexSounds")) {
       ui.notifications.info(game.i18n.localize("mtte.indexingInProgress"));
       this.html.find(".indexSounds").prop("disabled", true);
-      // first level = publishers
-      let publishers = []
-      let dir1 = await FilePicker.browse(Moulinette.getSource(), Moulinette.FOLDER_CUSTOM_SOUNDS);
-      for(const pub of dir1.dirs) {
-        let publisher = { publisher: decodeURI(pub.split('/').pop()), packs: [] }
-        console.log(pub)
-        // second level = packs
-        let dir2 = await FilePicker.browse(Moulinette.getSource(), pub);
-        console.log(dir2)
-        for(const pack of dir2.dirs) {
-          let files = await MoulinetteForge._scanFolder(pack, ["mp3", "ogg", "wav"]);
-          // remove pack path from file path
-          files = files.map( (path) => { return decodeURI(path).split(decodeURI(pack))[1] } )
-          publisher.packs.push({ name: decodeURI(pack.split('/').pop()), path: pack, assets: files })
-        }
-        publishers.push(publisher)
+      const EXT = ["mp3", "ogg", "wav"]
+      let publishers = await Moulinette.scanAssets(Moulinette.FOLDER_CUSTOM_SOUNDS, EXT)
+      const customPath = game.settings.get("fvtt-moulinette", "customPath")
+      if(customPath) {
+        publishers.push(...await Moulinette.scanAssetsInCustomFolders(customPath, EXT))
       }
       await Moulinette.upload(new File([JSON.stringify(publishers)], "index.json", { type: "application/json", lastModified: new Date() }), "index.json", "/moulinette/sounds", Moulinette.FOLDER_CUSTOM_SOUNDS, true)
       ui.notifications.info(game.i18n.localize("mtte.indexingDone"));
@@ -1121,7 +1225,7 @@ class MoulinetteForge extends FormApplication {
   
   
   /**
-   * Returns the list of all images in folder (and its subfolders)
+   * Returns the list of all files in folder (and its subfolders) matching filter
    */
   static async _scanFolder(path, filter) {
     let list = []
@@ -1729,14 +1833,17 @@ class MoulinetteSearchResult extends FormApplication {
       console.log(`Moulinette | Cannot download image ${svg}`, e)
       return;
     });
-
+    const blob = await res.blob()
+    
     let imageName = this.data.url.split('/').pop()
     if(imageName.includes(".")) {
       imageName = imageName.substr(0, imageName.lastIndexOf('.'));
     }
+    if(!this.data.format) {
+      this.data.format = blob.type.split('/').pop()
+    }
     imageName = imageName.replace(/[\W_]+/g,"-") + "." + this.data.format
     
-    const blob = await res.blob()
     await Moulinette.upload(new File([blob], imageName, { type: blob.type, lastModified: new Date() }), imageName, "moulinette/images", `moulinette/images/search`, false)
     const filepath = "moulinette/images/search/" + imageName
 
@@ -1752,6 +1859,7 @@ class MoulinetteSearchResult extends FormApplication {
     super.activateListeners(html);
     this.bringToTop()
     html.find(".thumb").css('background', `url(${this.data.thumb}) 50% 50% no-repeat`)
+    this.html = html
   }
   
 }

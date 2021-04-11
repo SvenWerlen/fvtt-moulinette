@@ -35,6 +35,14 @@ Hooks.once("init", async function () {
     type: Number,
     choices: { 1: "1", 2: "2", 3: "3", 4: "4", 5: "5" }
   });
+  game.settings.register("fvtt-moulinette", "customPath", {
+    name: game.i18n.localize("config.mtteCustomPath"), 
+    hint: game.i18n.localize("config.mtteCustomPathHint"), 
+    scope: "world",
+    config: true,
+    default: "",
+    type: String
+  });
   
   //const reader = new zip.HttpReader
   //const reader = new zip.ZipReader(new zip.HttpReader("https://www.patreon.com/file?h=27576090&i=3959878"))

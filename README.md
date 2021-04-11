@@ -136,8 +136,8 @@ To **manually install** the module, follow these instructions:
 
 There are 3 different ways to open the user intervace:
 * Shortcut : `CTRL + M`
-* Button available in the `Parameters` tab
-* Macro avaiable in the Moulinette macros compendium
+* Macros available in the Moulinette macros compendium
+* Moulinette adds a new control (icon on the top-left corner). Requires a scene to be loaded.
 
 ### Why Moulinette is not available in the official list ?
 
